@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/services/api_service.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/services/api_service.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;

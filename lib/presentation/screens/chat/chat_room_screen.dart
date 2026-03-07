@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/controllers/chat_controller.dart';
-import 'package:vtalk_app/data/models/chat_room.dart';
-import 'package:vtalk_app/presentation/widgets/molecules/chat_input_field.dart';
-import 'package:vtalk_app/presentation/widgets/molecules/message_bubble.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/controllers/chat_controller.dart';
+import 'package:knoty/data/models/chat_room.dart';
+import 'package:knoty/presentation/widgets/molecules/chat_input_field.dart';
+import 'package:knoty/presentation/widgets/molecules/message_bubble.dart';
 
 const Color _kChatBackground = Color(0xFFF8F9FA);
 const Color _kChatAppBarBackground = Color(0xFFFFFFFF);

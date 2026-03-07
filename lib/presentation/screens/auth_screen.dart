@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/presentation/widgets/airy_input_field.dart';
-import 'package:vtalk_app/presentation/widgets/airy_button.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/presentation/widgets/airy_input_field.dart';
+import 'package:knoty/presentation/widgets/airy_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 

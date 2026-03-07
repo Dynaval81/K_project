@@ -6,7 +6,7 @@ import '../services/auth_service.dart';
 import '../utils/glass_kit.dart';
 import '../theme_provider.dart';
 import '../providers/user_provider.dart';
-import 'package:vtalk_app/data/models/user_model.dart';
+import 'package:knoty/data/models/user_model.dart';
 import 'main_app.dart';
 
 class EmailVerificationScreen extends StatefulWidget {

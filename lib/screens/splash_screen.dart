@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vtalk_app/presentation/widgets/organisms/main_nav_shell.dart';
-import 'package:vtalk_app/presentation/screens/auth/login_screen.dart';
+import 'package:knoty/presentation/widgets/organisms/main_nav_shell.dart';
+import 'package:knoty/presentation/screens/auth/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

@@ -2,42 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/core/controllers/auth_controller.dart';
-import 'package:vtalk_app/core/controllers/chat_controller.dart';
-import 'package:vtalk_app/core/controllers/tab_visibility_controller.dart';
-import 'package:vtalk_app/core/controllers/vpn_controller.dart';
-import 'package:vtalk_app/presentation/screens/auth/login_screen.dart';
-import 'package:vtalk_app/presentation/screens/auth/register_screen.dart';
-import 'package:vtalk_app/presentation/screens/auth/registration_success_screen.dart';
-import 'package:vtalk_app/presentation/screens/auth/email_verification_screen.dart';
-import 'package:vtalk_app/presentation/screens/chat/chat_room_screen.dart';
-import 'package:vtalk_app/presentation/screens/settings_screen.dart';
-import 'package:vtalk_app/presentation/screens/splash_screen.dart';
-import 'package:vtalk_app/presentation/widgets/airy_button.dart';
-import 'package:vtalk_app/presentation/widgets/organisms/main_nav_shell.dart';
-import 'package:vtalk_app/data/models/chat_room.dart';
-import 'package:vtalk_app/providers/user_provider.dart';
-import 'package:vtalk_app/theme_provider.dart';
-import 'package:vtalk_app/theme/app_theme.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/core/controllers/auth_controller.dart';
+import 'package:knoty/core/controllers/chat_controller.dart';
+import 'package:knoty/core/controllers/tab_visibility_controller.dart';
+import 'package:knoty/presentation/screens/auth/login_screen.dart';
+import 'package:knoty/presentation/screens/auth/register_screen.dart';
+import 'package:knoty/presentation/screens/auth/registration_success_screen.dart';
+import 'package:knoty/presentation/screens/auth/email_verification_screen.dart';
+import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
+import 'package:knoty/presentation/screens/settings_screen.dart';
+import 'package:knoty/presentation/screens/splash_screen.dart';
+import 'package:knoty/presentation/widgets/airy_button.dart';
+import 'package:knoty/presentation/widgets/organisms/main_nav_shell.dart';
+import 'package:knoty/data/models/chat_room.dart';
+import 'package:knoty/providers/user_provider.dart';
+import 'package:knoty/theme_provider.dart';
+import 'package:knoty/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
-import 'package:vtalk_app/core/utils/app_logger.dart';
-import 'package:vtalk_app/core/config/flavor_config.dart';
+import 'package:knoty/core/utils/app_logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  AppLogger.instance.init(); // Запускаем сбор логов
+  AppLogger.instance.init();
 
   final userProvider = UserProvider();
-  final vpnController = VpnController();
   final authController = AuthController(
     onUserLoaded: userProvider.setUser,
-    onLogout: () async {
-      if (vpnController.isConnected) {
-        await vpnController.toggleConnection();
-      }
-    },
   );
 
   await authController.tryRestoreSession();
@@ -57,23 +49,22 @@ void main() async {
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => ChatController()),
         ChangeNotifierProvider(create: (_) => TabVisibilityController()..load()),
-        ChangeNotifierProvider.value(value: vpnController),
       ],
-      child: VTalkApp(initialLocation: initialLocation),
+      child: KnotyApp(initialLocation: initialLocation),
     ),
   );
 }
 
-class VTalkApp extends StatefulWidget {
+class KnotyApp extends StatefulWidget {
   final String initialLocation;
 
-  const VTalkApp({super.key, required this.initialLocation});
+  const KnotyApp({super.key, required this.initialLocation});
 
   @override
-  State<VTalkApp> createState() => _VTalkAppState();
+  State<KnotyApp> createState() => _KnotyAppState();
 }
 
-class _VTalkAppState extends State<VTalkApp> {
+class _KnotyAppState extends State<KnotyApp> {
   late final GoRouter _router;
 
   @override
@@ -101,7 +92,7 @@ class _VTalkAppState extends State<VTalkApp> {
             return EmailVerificationScreen(
               email: extra['email']?.toString() ?? '',
               nickname: extra['nickname']?.toString() ?? '',
-              vtalkNumber: extra['vtalkNumber']?.toString() ?? '',
+              vtalkNumber: extra['knotyNumber']?.toString() ?? '',
             );
           },
         ),
@@ -111,7 +102,7 @@ class _VTalkAppState extends State<VTalkApp> {
             final extra = state.extra as Map<String, dynamic>? ?? {};
             return RegistrationSuccessScreen(
               nickname: extra['nickname']?.toString() ?? '',
-              vtalkNumber: extra['vtalkNumber']?.toString() ?? '',
+              vtalkNumber: extra['knotyNumber']?.toString() ?? '',
             );
           },
         ),
@@ -152,8 +143,7 @@ class _VTalkAppState extends State<VTalkApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      // Локаль фиксируется на этапе сборки через flavor
-      locale: Locale(FlavorConfig.locale),
+      locale: const Locale('de'),
     );
   }
 }
@@ -171,7 +161,7 @@ class _ErrorScreen extends StatelessWidget {
         backgroundColor: AppColors.surface,
         elevation: 0,
         title: Text(
-          'Error',
+          'Fehler',
           style: TextStyle(
             color: AppColors.onSurface,
             fontSize: 20,
@@ -187,7 +177,7 @@ class _ErrorScreen extends StatelessWidget {
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.buttonPadding),
             Text(
-              'Something went wrong',
+              'Etwas ist schiefgelaufen',
               style: AppTextStyles.h3.copyWith(
                 color: AppColors.onSurface,
                 fontWeight: FontWeight.w700,
@@ -195,7 +185,7 @@ class _ErrorScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.inputPadding),
             Text(
-              error?.toString() ?? 'Unknown error occurred',
+              error?.toString() ?? 'Unbekannter Fehler',
               style: AppTextStyles.body.copyWith(
                 color: AppColors.onSurfaceVariant,
               ),
@@ -203,7 +193,7 @@ class _ErrorScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.buttonPadding * 3),
             AiryButton(
-              text: 'Go to Auth',
+              text: 'Zur Anmeldung',
               onPressed: () => context.go(AppRoutes.auth),
               icon: const Icon(Icons.refresh, size: 18),
             ),
@@ -228,9 +218,9 @@ class _ChatScreen extends StatelessWidget {
     } catch (_) {}
     if (room == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF000000),
+        backgroundColor: const Color(0xFFFFFFFF),
         appBar: AppBar(title: Text('Chat $chatId')),
-        body: const Center(child: Text('Chat not found')),
+        body: const Center(child: Text('Chat nicht gefunden')),
       );
     }
     return ChatRoomScreen(chat: room);

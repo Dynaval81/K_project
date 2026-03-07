@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/data/models/message_model.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/data/models/message_model.dart';
 
 /// HAI3 Molecule: Message bubble – stateless, Airy style.
 /// Sent: primary blue; received: light surface grey.

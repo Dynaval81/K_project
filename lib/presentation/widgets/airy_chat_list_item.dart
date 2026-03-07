@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/controllers/chat_controller.dart';
-import 'package:vtalk_app/core/services/chat_service.dart';
-import 'package:vtalk_app/data/models/chat_room.dart';
-import 'package:vtalk_app/data/mock/mock_messages.dart';
-import 'package:vtalk_app/presentation/screens/chat/chat_room_screen.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/controllers/chat_controller.dart';
+import 'package:knoty/core/services/chat_service.dart';
+import 'package:knoty/data/models/chat_room.dart';
+import 'package:knoty/data/mock/mock_messages.dart';
+import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
 
 class AiryChatListItem extends StatefulWidget {
   final ChatRoom chatRoom;

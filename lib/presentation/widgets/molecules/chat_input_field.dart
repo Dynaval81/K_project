@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vtalk_app/core/constants.dart';
+import 'package:knoty/core/constants.dart';
 
 /// HAI3 Molecule: Chat input bar – attachment, text field, send/voice.
 /// Stateful only for controller and typing state; otherwise minimal.

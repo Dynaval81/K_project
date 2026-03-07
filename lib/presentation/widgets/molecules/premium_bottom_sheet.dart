@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/presentation/atoms/airy_button.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/presentation/atoms/airy_button.dart';
 
 /// HAI3 Premium paywall bottom sheet – Airy style, 24dp+ corners, 20dp+ padding.
 void showPremiumBottomSheet(BuildContext context, {String? title, String? message}) {

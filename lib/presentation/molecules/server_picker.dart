@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/data/models/server_model.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/data/models/server_model.dart';
 
 /// HAI3 Molecule: Server/location picker list (Airy style).
 class ServerPicker extends StatelessWidget {

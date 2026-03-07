@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vtalk_app/l10n/app_localizations.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/presentation/atoms/airy_input_field.dart';
-import 'package:vtalk_app/services/api_service.dart';
+import 'package:knoty/l10n/app_localizations.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/presentation/atoms/airy_input_field.dart';
+import 'package:knoty/services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

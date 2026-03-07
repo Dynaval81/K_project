@@ -323,3 +323,108 @@ chatType: enum(direct | personalGroup | classGroup | teacherStudent)
 7. User limits API
 8. Parent-child linking
 9. Chat types (personalGroup + classGroup)
+
+---
+
+## Дополнения по вопросам бэкендера
+
+### 1. GDPR — Audit Log (обязательно для школьных систем Германии)
+Логировать кто и когда смотрел данные ребёнка:
+```
+AuditLog {
+  id:         string
+  actorId:    string       (кто смотрел — anonymized)
+  targetId:   string       (чьи данные — anonymized)
+  action:     string       (VIEW_PROFILE | VIEW_ACTIVITY | CHANGE_LIMITS | APPROVE_USER | BAN_USER)
+  timestamp:  datetime
+  ip:         string (hashed)
+}
+```
+```
+GET /admin/audit-log?targetId=&from=&to=
+Доступно: schoolAdmin (своя школа), appAdmin (все)
+```
+PII в лог не пишем — только anonymized ID и тип действия.
+
+### 2. classGroup — автосоздание при верификации
+Если classGroup для schoolId+classId уже существует → просто добавить пользователя в участники.
+Если не существует → создать и добавить.
+Дублей не создавать.
+
+### 3. Лимиты времени — таблица сессий
+Считать через таблицу UserSession, не счётчик:
+```
+UserSession {
+  id:        string
+  userId:    string
+  startedAt: datetime
+  endedAt:   datetime | null
+  date:      date           (для быстрой выборки за день)
+  minutes:   int            (вычисляется при закрытии сессии)
+}
+```
+Клиент отправляет heartbeat каждые 60 сек пока приложение активно.
+При превышении dailyMinutes → API возвращает 403 с кодом `DAILY_LIMIT_REACHED`.
+Сброс в полночь по берлинскому времени (Europe/Berlin).
+
+```
+POST /sessions/start          — открыть сессию
+POST /sessions/heartbeat      — продлить (каждые 60 сек)
+POST /sessions/end            — закрыть
+GET  /sessions/today          — сколько минут использовано сегодня
+```
+
+### 4. ParentChild — отдельная таблица
+Убрать parentId/childId из UserModel. Заменить на:
+```
+ParentChild {
+  id:        string
+  parentId:  string
+  childId:   string
+  linkedAt:  datetime
+  linkedBy:  adminId
+}
+```
+Один родитель может иметь несколько детей.
+Один ребёнок может иметь несколько родителей (мама + папа).
+
+```
+GET  /parent/children                    — список детей родителя
+GET  /parent/child/:childId/activity     — активность ребёнка
+POST /admin/users/:id/link-parent        — { parentId, childId }
+DELETE /admin/parent-child/:id           — убрать связку
+```
+
+---
+
+## Дополнения от бэкендера (финальные уточнения)
+
+### teacherStudent чат
+- Работает через KN-номер (уникальный ID пользователя в системе, формат KN-XXXXXX)
+- Если контакты закрыты — требуется запрос на общение, вторая сторона одобряет
+- Учитель может писать ученику напрямую (schoolVerified+)
+- Ученик пишет учителю через запрос
+
+### Группы — joinPolicy и приглашения
+```
+Group {
+  ...
+  joinPolicy: enum(open | invite_only | request)
+}
+```
+- `open` — любой schoolVerified может вступить
+- `invite_only` — только по приглашению от участника/модератора
+- `request` — пользователь отправляет запрос, модератор одобряет
+
+Приглашения требуют одобрения модератора для `request` политики.
+
+### KN-номер
+Уникальный человекочитаемый ID каждого пользователя.
+Формат: `KN-XXXXXX` (6 цифр, генерируется при регистрации).
+Используется для поиска пользователей вместо телефона/email.
+Отображается в профиле — пользователь может поделиться своим KN-номером.
+
+### Импорт классов
+Классы можно создавать через форму ИЛИ импорт Excel.
+Excel формат: firstName | lastName | classId | role
+Генерирует коды автоматически для каждого ученика в списке.

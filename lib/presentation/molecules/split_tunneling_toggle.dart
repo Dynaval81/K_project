@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vtalk_app/core/constants.dart';
+import 'package:knoty/core/constants.dart';
 
 /// HAI3 Molecule: Split tunneling switch – "VPN only for selected" (Amnesia-style, Airy).
 class SplitTunnelingToggle extends StatelessWidget {

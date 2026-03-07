@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:vtalk_app/core/controllers/chat_controller.dart';
-import 'package:vtalk_app/presentation/screens/chat/chat_room_screen.dart';
-import 'package:vtalk_app/presentation/widgets/airy_chat_header.dart';
-import 'package:vtalk_app/presentation/widgets/chat_search_delegate.dart';
-import 'package:vtalk_app/presentation/widgets/airy_chat_list_item.dart';
+import 'package:knoty/core/controllers/chat_controller.dart';
+import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
+import 'package:knoty/presentation/widgets/airy_chat_header.dart';
+import 'package:knoty/presentation/widgets/chat_search_delegate.dart';
+import 'package:knoty/presentation/widgets/airy_chat_list_item.dart';
 
 /// 📱 V-Talk Chats Screen - L4 UI Layer
 /// Airy design with glassmorphism header and structured chat list

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/core/controllers/ai_controller.dart';
-import 'package:vtalk_app/presentation/widgets/molecules/chat_input_field.dart';
-import 'package:vtalk_app/presentation/widgets/molecules/message_bubble.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/core/controllers/ai_controller.dart';
+import 'package:knoty/presentation/widgets/molecules/chat_input_field.dart';
+import 'package:knoty/presentation/widgets/molecules/message_bubble.dart';
 
 /// V-Assistant distinct bubble color (light purple).
 const Color kAiBubbleColor = Color(0xFFF3E5F5);

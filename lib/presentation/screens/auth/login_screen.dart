@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:vtalk_app/l10n/app_localizations.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/core/controllers/auth_controller.dart';
-import 'package:vtalk_app/presentation/atoms/airy_input_field.dart';
+import 'package:knoty/l10n/app_localizations.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/core/controllers/auth_controller.dart';
+import 'package:knoty/presentation/atoms/airy_input_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

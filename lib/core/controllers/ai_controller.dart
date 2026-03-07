@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:vtalk_app/data/models/message_model.dart';
+import 'package:knoty/data/models/message_model.dart';
 
 /// Mock delay for "AI is thinking..." (seconds).
 const int kAiThinkingDelaySeconds = 2;

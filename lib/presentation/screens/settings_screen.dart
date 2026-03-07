@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:vtalk_app/constants/app_colors.dart';
-import 'package:vtalk_app/core/controllers/auth_controller.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/l10n/app_localizations.dart';
-import 'package:vtalk_app/providers/user_provider.dart';
-import 'package:vtalk_app/services/api_service.dart';
-import 'package:vtalk_app/data/models/user_model.dart';
-import 'package:vtalk_app/theme_provider.dart';
+import 'package:knoty/constants/app_colors.dart';
+import 'package:knoty/core/controllers/auth_controller.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/l10n/app_localizations.dart';
+import 'package:knoty/providers/user_provider.dart';
+import 'package:knoty/services/api_service.dart';
+import 'package:knoty/data/models/user_model.dart';
+import 'package:knoty/theme_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:vtalk_app/data/models/user_model.dart';
-import 'package:vtalk_app/services/api_service.dart';
+import 'package:knoty/data/models/user_model.dart';
+import 'package:knoty/services/api_service.dart';
 
 class UserProvider with ChangeNotifier {
   User? _user;

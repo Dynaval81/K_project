@@ -1,4 +1,4 @@
-package com.example.vtalk_app
+package de.knoty.app
 
 import io.flutter.embedding.android.FlutterActivity
 

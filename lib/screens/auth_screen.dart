@@ -8,7 +8,7 @@ import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import '../screens/email_verification_screen.dart';
 import '../providers/user_provider.dart';
-import 'package:vtalk_app/data/models/user_model.dart';
+import 'package:knoty/data/models/user_model.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});

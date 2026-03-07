@@ -1,5 +1,5 @@
-name: vtalk_app
-description: "A new Flutter project."
+name: knoty
+description: "Knoty — Bildungs-Messenger für Schüler in Deutschland."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -21,9 +21,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   cached_network_image: ^3.3.1
   flutter_svg: ^2.0.9
-  flutter_singbox_vpn:
-    path: packages/flutter_singbox_vpn
-  installed_apps: ^1.4.1
+  lottie: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -33,9 +31,9 @@ dev_dependencies:
 
 flutter_native_splash:
   color: "#FFFFFF"
-  image: assets/images/logo_bnb.png
+  image: assets/images/logo_knoty.png
   android_12:
-    image: assets/images/logo_bnb.png
+    image: assets/images/logo_knoty.png
     color: "#FFFFFF"
   fullscreen: true
 
@@ -44,3 +42,5 @@ flutter:
   generate: true
   assets:
     - assets/images/
+    - assets/icons/
+    - assets/animations/

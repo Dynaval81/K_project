@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:vtalk_app/core/constants.dart';
-import 'package:vtalk_app/core/constants/app_constants.dart';
-import 'package:vtalk_app/core/controllers/auth_controller.dart';
+import 'package:knoty/core/constants.dart';
+import 'package:knoty/core/constants/app_constants.dart';
+import 'package:knoty/core/controllers/auth_controller.dart';
 
 /// HAI3 Zen Splash — бесшовный переход, дыхание логотипа, фирменный тэглайн.
 class SplashScreen extends StatefulWidget {

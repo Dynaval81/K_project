@@ -1,4 +1,4 @@
-import 'package:vtalk_app/data/models/chat_room.dart';
+import 'package:knoty/data/models/chat_room.dart';
 
 /// Data layer model for chat list state (HAI3).
 /// Holds unread count and exposes [markAsRead] for the controller to call.

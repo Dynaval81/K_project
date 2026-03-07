@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:vtalk_app/core/services/chat_service.dart';
-import 'package:vtalk_app/data/models/chat_model.dart';
-import 'package:vtalk_app/data/models/chat_room.dart';
-import 'package:vtalk_app/data/models/message_model.dart';
-import 'package:vtalk_app/logic/chat_manager.dart';
+import 'package:knoty/core/services/chat_service.dart';
+import 'package:knoty/data/models/chat_model.dart';
+import 'package:knoty/data/models/chat_room.dart';
+import 'package:knoty/data/models/message_model.dart';
+import 'package:knoty/logic/chat_manager.dart';
 
 /// Single chat state controller (Provider-only). Replaces Riverpod ChatProvider.
 class ChatController extends ChangeNotifier {

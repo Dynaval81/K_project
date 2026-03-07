@@ -1,0 +1,158 @@
+# Knoty — Windsurf Rules (HAI3 Canon v3 — FINAL)
+
+## Project
+Knoty — educational messenger for German schoolchildren.
+Platform: Android only (MVP). Bundle ID: de.knoty.app
+Admin panel: Knoty Admin (separate web project).
+Base: vtalk_app (Flutter). Interface: German (de) only.
+
+## Stack
+- Flutter Stable, Android only
+- State: ONLY provider (riverpod/bloc/get_it — FORBIDDEN)
+- Navigation: PageView + BottomNavigationBar + swipe
+- Imports: absolute only — package:knoty/...
+- Key packages: flutter_secure_storage, http, flutter_localizations,
+  flutter_svg, lottie, cached_network_image
+
+## Architecture: Feature-first
+```
+lib/
+  features/
+    auth/           registration, login, pending screen, activation code
+    messenger/      direct chats + personal groups + class groups
+    schedule/       demo stub v1
+    ai_assistant/   AI helper, interface-based, with limits
+    password_vault/ fullyVerified only
+    school/         school groups, classes
+    admin/          schoolAdmin + appAdmin only
+  core/
+    models/         UserModel, UserRole enum, VerificationLevel enum, UserLimits
+    services/       PermissionService, UsageTrackingService, AiService (abstract)
+    utils/          FormatUtils (DE), StorageMigrationUtils
+  presentation/
+    widgets/        Atomic Design: atoms / molecules / organisms
+```
+
+## Roles — ENUM ONLY, no boolean flags
+```dart
+enum UserRole { student, parent, teacher, schoolAdmin, appAdmin }
+enum VerificationLevel { sandbox, schoolVerified, fullyVerified }
+```
+
+## Module access matrix
+| Module              | sandbox | schoolVerified | fullyVerified |
+|---------------------|---------|----------------|---------------|
+| Direct chats        | ✅      | ✅             | ✅            |
+| Personal groups     | ✅      | ✅             | ✅            |
+| AI (limited)        | ✅      | ✅             | ✅ (parent limit) |
+| Class groups        | 🔒      | ✅             | ✅            |
+| Schedule            | 🔒      | ✅             | ✅            |
+| Password vault      | 🔒      | 🔒             | ✅            |
+
+Locked modules: show with 🔒 icon + German explanation text. Never hide completely.
+
+## Limits
+Fetched from backend at startup — NOT hardcoded in client.
+Defaults (set by appAdmin in Knoty Admin):
+- sandbox: 30 min/day, 10 AI requests/day
+- schoolVerified: 60 min/day, 30 AI requests/day
+- Parent can override limits for their child (fullyVerified only)
+
+## Registration flows
+A) Student + code → immediate schoolVerified
+B) Student without code → sandbox → admin approves → schoolVerified
+C) Parent → sandbox → admin approves → fullyVerified
+D) Teacher → sandbox → schoolAdmin approves → schoolVerified
+
+## Pending screen
+Show when isApproved == false.
+Text: "Deine Anfrage wird vom Schuladministrator geprüft."
+Allow: direct chats, personal groups, limited AI.
+Block: class groups, schedule, password vault.
+
+## Storage cleanup on first launch
+Run StorageMigrationUtils in main.dart before init.
+Clear old vtalk_app keys: vpn_*, singbox_*, server_*, connection_*
+from both FlutterSecureStorage and SharedPreferences.
+
+## HAI3 Design — German Edition
+- Minimalism, airy, lots of white space. Font: Roboto or Inter.
+- Background:      #FFFFFF
+- Primary accent:  #E6B800 (muted gold — buttons, active icons)
+- Danger only:     #CC0000 (delete, logout, critical alerts)
+- Text primary:    #1A1A1A (anthracite)
+- Text secondary:  #6B6B6B
+- Card/Surface:    #F5F5F5
+- Border:          #E0E0E0
+- Success:         #2E7D32
+- Error:           #B00020
+- Border radius:   24dp minimum everywhere
+- Padding:         20dp minimum outer containers
+- Headings:        min 22px | Body: min 16px
+- Icons:           SVG only via flutter_svg (NO PNG/JPG)
+- Animations:      Lottie JSON
+- Images:          CachedNetworkImage with fade-in
+
+## AI Service — must be interface-based
+```dart
+abstract class AiService {
+  Future<String> sendMessage(String prompt, {required String userId});
+  Future<bool> checkLimit(String userId);
+}
+```
+Swappable: OpenAI ↔ Aleph Alpha (German GDPR model) without UI changes.
+
+## German formats (FormatUtils — centralized)
+- Date: DD.MM.YYYY
+- Time: 24h (14:30)
+- Decimal: comma (1,5)
+- Currency: 12,50 €
+
+## GDPR-First — NON-NEGOTIABLE
+- NO PII in any logs (no names, phones, emails in debugPrint/print)
+- Log only: event_type, timestamp, anonymized user_id
+- No data outside Germany
+
+## Localization — MANDATORY
+- All strings via AppLocalizations.of(context)!.key
+- No hardcoded strings anywhere in widgets
+- No Cyrillic in code or comments
+- app_de.arb (primary) + app_en.arb (fallback)
+- l10n.yaml configured for package: knoty
+- German words 30-50% longer → always Flexible/Expanded in Row
+- TextOverflow.ellipsis or maxLines on all text
+- No fixed width on buttons or text containers
+
+## FORBIDDEN
+- VPN code (completely removed)
+- Russian/English UI strings
+- Hardcoded UI strings
+- dynamic types
+- Relative imports
+- Boolean role flags (isTeacher, isAdmin, etc.)
+- PII in logs
+- Data outside Germany
+- Cyrillic in code/comments
+- PNG/JPG icons
+
+## Code language
+- Code, variables, comments: English
+- UI strings: German (via .arb)
+- AI ↔ developer: Russian
+
+## Build order (strict)
+1.  Rename: pubspec (knoty), bundle ID (de.knoty.app), app label (Knoty)
+2.  Android: kotlin package folder de/knoty/app/, update MainActivity
+3.  All dart imports: package:vtalk_app → package:knoty
+4.  Delete VPN files + remove from pubspec.yaml
+5.  StorageMigrationUtils (clean old vtalk keys)
+6.  UserRole enum + VerificationLevel enum + UserModel update
+7.  PermissionService
+8.  FormatUtils (DE formats)
+9.  New splash screen (Knoty brand, white + #E6B800)
+10. Auth flow (register + activation code + pending screen)
+11. Messenger (personal groups available in sandbox)
+12. Schedule stub screen
+13. Password vault (fullyVerified gate)
+14. AI assistant (interface-based + limits)
+15. Localization (app_de.arb)

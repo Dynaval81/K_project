@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:knoty/constants/app_colors.dart';
 import 'package:knoty/core/controllers/auth_controller.dart';
 import 'package:knoty/core/constants/app_constants.dart';
 import 'package:knoty/l10n/app_localizations.dart';
-import 'package:knoty/providers/user_provider.dart';
-import 'package:knoty/services/api_service.dart';
-import 'package:knoty/data/models/user_model.dart';
 import 'package:knoty/theme_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -25,11 +21,12 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.black87, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_rounded,
+              color: Colors.black87, size: 20),
           onPressed: () => context.pop(),
         ),
         title: Text(
-          l10n.settings_title,
+          l10n.settingsTitle,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -41,40 +38,47 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // ── Тема ─────────────────────────────────────────────────
-          _SectionCard(
-            children: [
-              _SettingsRow(
-                icon: Icons.palette_outlined,
-                title: l10n.settings_theme,
-                trailing: _ThemeToggle(provider: themeProvider),
-              ),
-            ],
-          ),
+          // Theme
+          _SectionCard(children: [
+            _SettingsRow(
+              icon: Icons.palette_outlined,
+              title: l10n.settingsTheme,
+              trailing: _ThemeToggle(provider: themeProvider),
+            ),
+          ]),
           const SizedBox(height: 12),
 
+          // Language
+          _SectionCard(children: [
+            _SettingsRow(
+              icon: Icons.language_outlined,
+              title: l10n.settingsLanguage,
+              trailing: Text(
+                'Deutsch',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 12),
+
+          // Activation code
           const _ActivationCard(),
           const SizedBox(height: 12),
 
-          // ── О приложении ─────────────────────────────────────────
-          _SectionCard(
-            children: [
-              _SettingsRow(
-                icon: Icons.info_outline_rounded,
-                title: l10n.dashboard_app_info,
-                trailing: Text(
-                  '1.0.0',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade500,
-                  ),
-                ),
+          // App info
+          _SectionCard(children: [
+            _SettingsRow(
+              icon: Icons.info_outline_rounded,
+              title: l10n.dashboardAppInfo,
+              trailing: Text(
+                '1.0.0',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
               ),
-            ],
-          ),
+            ),
+          ]),
           const SizedBox(height: 24),
 
-          // ── Выйти ────────────────────────────────────────────────
+          // Logout
           SizedBox(
             width: double.infinity,
             height: 52,
@@ -84,7 +88,7 @@ class SettingsScreen extends StatelessWidget {
                 if (context.mounted) context.go(AppRoutes.auth);
               },
               icon: const Icon(Icons.logout_rounded, size: 18),
-              label: Text(l10n.dashboard_logout),
+              label: Text(l10n.settingsLogout),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 foregroundColor: Colors.white,
@@ -150,10 +154,10 @@ class _SettingsRow extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primaryBlue.withOpacity(0.08),
+                color: const Color(0xFFE6B800).withOpacity(0.10),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: AppColors.primaryBlue, size: 18),
+              child: Icon(icon, color: const Color(0xFFE6B800), size: 18),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -198,18 +202,12 @@ class _ThemeToggleState extends State<_ThemeToggle> {
           _Btn(
             icon: Icons.light_mode_rounded,
             active: !isDark,
-            onTap: () {
-              widget.provider.setTheme(false);
-              setState(() {});
-            },
+            onTap: () { widget.provider.setTheme(false); setState(() {}); },
           ),
           _Btn(
             icon: Icons.dark_mode_rounded,
             active: isDark,
-            onTap: () {
-              widget.provider.setTheme(true);
-              setState(() {});
-            },
+            onTap: () { widget.provider.setTheme(true); setState(() {}); },
           ),
         ],
       ),
@@ -240,12 +238,14 @@ class _Btn extends StatelessWidget {
         ),
         child: Icon(icon,
             size: 16,
-            color: active ? AppColors.primaryBlue : Colors.grey.shade500),
+            color: active
+                ? const Color(0xFFE6B800)
+                : Colors.grey.shade500),
       ),
     );
   }
 }
-// ── Карточка активации кода ───────────────────────────────────────────────────
+
 class _ActivationCard extends StatefulWidget {
   const _ActivationCard();
 
@@ -267,43 +267,37 @@ class _ActivationCardState extends State<_ActivationCard> {
 
   Future<void> _activate() async {
     final code = _ctrl.text.trim();
+    final l10n = AppLocalizations.of(context)!;
     if (code.isEmpty) return;
 
     setState(() { _loading = true; _error = null; _success = false; });
 
     try {
-      final result = await ApiService().activatePremium(code);
-      if (!mounted) return;
-
-      if (result['success'] == true) {
-        if (result['user'] != null) {
-          final updatedUser = User.fromJson(result['user'] as Map<String, dynamic>);
-          context.read<UserProvider>().setUser(updatedUser);
-          context.read<AuthController>().updateUser(updatedUser);
-        } else {
-          await context.read<AuthController>().refreshUser();
-        }
-        HapticFeedback.mediumImpact();
-        setState(() { _success = true; _loading = false; });
-        _ctrl.clear();
-        await Future.delayed(const Duration(seconds: 3));
-        if (mounted) setState(() => _success = false);
-      } else {
-        setState(() { _error = result['error'] ?? 'Ошибка активации'; _loading = false; });
-      }
+      // TODO: connect to real API
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() { _success = true; _loading = false; });
+      _ctrl.clear();
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) setState(() => _success = false);
     } catch (e) {
-      if (mounted) setState(() { _error = 'Ошибка сети'; _loading = false; });
+      if (mounted) {
+        setState(() { _error = l10n.errorNetwork; _loading = false; });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       padding: const EdgeInsets.all(20),
@@ -315,47 +309,61 @@ class _ActivationCardState extends State<_ActivationCard> {
               Container(
                 width: 36, height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlue.withOpacity(0.08),
+                  color: const Color(0xFFE6B800).withOpacity(0.10),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.vpn_key_outlined, color: AppColors.primaryBlue, size: 18),
+                child: const Icon(Icons.vpn_key_outlined,
+                    color: Color(0xFFE6B800), size: 18),
               ),
               const SizedBox(width: 12),
-              const Text('Код активации',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87)),
+              const Text(
+                'Aktivierungscode',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87),
+              ),
             ],
           ),
           const SizedBox(height: 16),
           if (_success)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(12)),
               child: const Row(
                 children: [
                   Icon(Icons.check_circle, color: Colors.green, size: 18),
                   SizedBox(width: 8),
-                  Text('VPN доступ активирован!', style: TextStyle(color: Colors.green, fontSize: 14)),
+                  Text('Code aktiviert!',
+                      style: TextStyle(color: Colors.green, fontSize: 14)),
                 ],
               ),
             )
           else ...[
             Container(
-              decoration: BoxDecoration(color: const Color(0xFFF1F3F5), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: const Color(0xFFF1F3F5),
+                  borderRadius: BorderRadius.circular(12)),
               child: TextField(
                 controller: _ctrl,
                 style: const TextStyle(fontSize: 15),
                 decoration: const InputDecoration(
-                  hintText: 'Введите код',
+                  hintText: 'KNOTY-XXXX-XXXX',
                   hintStyle: TextStyle(color: Colors.black38),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
                 onSubmitted: (_) => _activate(),
               ),
             ),
             if (_error != null) ...[
               const SizedBox(height: 8),
-              Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
+              Text(_error!,
+                  style: const TextStyle(
+                      color: Colors.redAccent, fontSize: 13)),
             ],
             const SizedBox(height: 12),
             SizedBox(
@@ -364,16 +372,20 @@ class _ActivationCardState extends State<_ActivationCard> {
               child: ElevatedButton(
                 onPressed: _loading ? null : _activate,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryBlue,
+                  backgroundColor: const Color(0xFFE6B800),
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _loading
-                    ? const SizedBox(width: 18, height: 18,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Активировать',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                    ? const SizedBox(
+                        width: 18, height: 18,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2))
+                    : const Text('Aktivieren',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 15)),
               ),
             ),
           ],

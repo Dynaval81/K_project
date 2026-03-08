@@ -100,539 +100,449 @@ abstract class AppLocalizations {
     Locale('ru')
   ];
 
-  /// No description provided for @login_title.
+  /// No description provided for @splashTagline.
   ///
-  /// In ru, this message translates to:
-  /// **'Вход'**
-  String get login_title;
+  /// In de, this message translates to:
+  /// **'Verbinde deine Schulwelt'**
+  String get splashTagline;
 
-  /// No description provided for @login_subtitle.
+  /// No description provided for @loginTitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Войдите в свой аккаунт'**
-  String get login_subtitle;
+  /// In de, this message translates to:
+  /// **'Anmelden'**
+  String get loginTitle;
 
-  /// No description provided for @login_method_email.
+  /// No description provided for @loginSubtitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Email'**
-  String get login_method_email;
+  /// In de, this message translates to:
+  /// **'Melde dich bei deinem Konto an'**
+  String get loginSubtitle;
 
-  /// No description provided for @login_method_vtalk_id.
+  /// No description provided for @loginMethodEmail.
   ///
-  /// In ru, this message translates to:
-  /// **'V-Talk ID'**
-  String get login_method_vtalk_id;
+  /// In de, this message translates to:
+  /// **'E-Mail'**
+  String get loginMethodEmail;
 
-  /// No description provided for @login_method_nickname.
+  /// No description provided for @loginHintEmail.
   ///
-  /// In ru, this message translates to:
-  /// **'Никнейм'**
-  String get login_method_nickname;
+  /// In de, this message translates to:
+  /// **'E-Mail eingeben'**
+  String get loginHintEmail;
 
-  /// No description provided for @login_label.
+  /// No description provided for @loginPasswordLabel.
   ///
-  /// In ru, this message translates to:
-  /// **'Логин'**
-  String get login_label;
+  /// In de, this message translates to:
+  /// **'Passwort'**
+  String get loginPasswordLabel;
 
-  /// No description provided for @login_hint_email.
+  /// No description provided for @loginPasswordHint.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите email'**
-  String get login_hint_email;
+  /// In de, this message translates to:
+  /// **'Passwort eingeben'**
+  String get loginPasswordHint;
 
-  /// No description provided for @login_hint_vtalk_id.
+  /// No description provided for @loginEnterPassword.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите V-Talk ID'**
-  String get login_hint_vtalk_id;
+  /// In de, this message translates to:
+  /// **'Passwort eingeben'**
+  String get loginEnterPassword;
 
-  /// No description provided for @login_hint_nickname.
+  /// No description provided for @loginButtonLogin.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите никнейм'**
-  String get login_hint_nickname;
+  /// In de, this message translates to:
+  /// **'Anmelden'**
+  String get loginButtonLogin;
 
-  /// No description provided for @login_primary_button.
+  /// No description provided for @loginForgotPassword.
   ///
-  /// In ru, this message translates to:
-  /// **'Поехали'**
-  String get login_primary_button;
+  /// In de, this message translates to:
+  /// **'Passwort vergessen?'**
+  String get loginForgotPassword;
 
-  /// No description provided for @login_divider_or.
+  /// No description provided for @loginDividerOr.
   ///
-  /// In ru, this message translates to:
-  /// **'или'**
-  String get login_divider_or;
+  /// In de, this message translates to:
+  /// **'oder'**
+  String get loginDividerOr;
 
-  /// No description provided for @login_google.
+  /// No description provided for @loginGoogle.
   ///
-  /// In ru, this message translates to:
-  /// **'Войти через Google'**
-  String get login_google;
+  /// In de, this message translates to:
+  /// **'Mit Google anmelden'**
+  String get loginGoogle;
 
-  /// No description provided for @login_apple.
+  /// No description provided for @loginApple.
   ///
-  /// In ru, this message translates to:
-  /// **'Войти через Apple'**
-  String get login_apple;
+  /// In de, this message translates to:
+  /// **'Mit Apple anmelden'**
+  String get loginApple;
 
-  /// No description provided for @login_no_account.
+  /// No description provided for @loginGoogleSoon.
   ///
-  /// In ru, this message translates to:
-  /// **'Нет аккаунта? '**
-  String get login_no_account;
+  /// In de, this message translates to:
+  /// **'Google Sign-In — demnächst verfügbar'**
+  String get loginGoogleSoon;
 
-  /// No description provided for @login_register.
+  /// No description provided for @loginAppleSoon.
   ///
-  /// In ru, this message translates to:
-  /// **'Зарегистрироваться'**
-  String get login_register;
+  /// In de, this message translates to:
+  /// **'Apple Sign-In — demnächst verfügbar'**
+  String get loginAppleSoon;
 
-  /// No description provided for @login_password_label.
+  /// No description provided for @loginNoAccount.
   ///
-  /// In ru, this message translates to:
-  /// **'Пароль'**
-  String get login_password_label;
+  /// In de, this message translates to:
+  /// **'Kein Konto? '**
+  String get loginNoAccount;
 
-  /// No description provided for @login_password_hint.
+  /// No description provided for @loginRegister.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите пароль'**
-  String get login_password_hint;
+  /// In de, this message translates to:
+  /// **'Registrieren'**
+  String get loginRegister;
 
-  /// No description provided for @login_button_submit.
+  /// No description provided for @loginErrorEmpty.
   ///
-  /// In ru, this message translates to:
-  /// **'Войти'**
-  String get login_button_submit;
+  /// In de, this message translates to:
+  /// **'E-Mail oder Nutzername eingeben'**
+  String get loginErrorEmpty;
 
-  /// No description provided for @login_forgot_password.
+  /// No description provided for @loginErrorEmptyPassword.
   ///
-  /// In ru, this message translates to:
-  /// **'Забыли пароль?'**
-  String get login_forgot_password;
+  /// In de, this message translates to:
+  /// **'Bitte Passwort eingeben'**
+  String get loginErrorEmptyPassword;
 
-  /// No description provided for @login_change_identifier.
+  /// No description provided for @loginErrorNetwork.
   ///
-  /// In ru, this message translates to:
-  /// **'изменить'**
-  String get login_change_identifier;
+  /// In de, this message translates to:
+  /// **'Netzwerkfehler. Bitte erneut versuchen.'**
+  String get loginErrorNetwork;
 
-  /// No description provided for @login_error_empty.
+  /// No description provided for @loginErrorEmailVerification.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите email, VT-ID или никнейм'**
-  String get login_error_empty;
+  /// In de, this message translates to:
+  /// **'Bitte bestätige deine E-Mail vor dem Login'**
+  String get loginErrorEmailVerification;
 
-  /// No description provided for @login_error_empty_password.
+  /// No description provided for @loginErrorGeneric.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите пароль'**
-  String get login_error_empty_password;
+  /// In de, this message translates to:
+  /// **'Anmeldefehler. Bitte erneut versuchen.'**
+  String get loginErrorGeneric;
 
-  /// No description provided for @login_error_network.
+  /// No description provided for @registerTitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Ошибка сети'**
-  String get login_error_network;
+  /// In de, this message translates to:
+  /// **'Registrieren'**
+  String get registerTitle;
 
-  /// No description provided for @register_title.
+  /// No description provided for @registerSubtitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Регистрация'**
-  String get register_title;
+  /// In de, this message translates to:
+  /// **'Konto erstellen'**
+  String get registerSubtitle;
 
-  /// No description provided for @register_subtitle.
+  /// No description provided for @registerEmailLabel.
   ///
-  /// In ru, this message translates to:
-  /// **'Создайте аккаунт'**
-  String get register_subtitle;
+  /// In de, this message translates to:
+  /// **'E-Mail'**
+  String get registerEmailLabel;
 
-  /// No description provided for @register_email_label.
+  /// No description provided for @registerEmailHint.
   ///
-  /// In ru, this message translates to:
-  /// **'Email'**
-  String get register_email_label;
+  /// In de, this message translates to:
+  /// **'E-Mail eingeben'**
+  String get registerEmailHint;
 
-  /// No description provided for @register_email_hint.
+  /// No description provided for @registerPasswordLabel.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите email'**
-  String get register_email_hint;
+  /// In de, this message translates to:
+  /// **'Passwort'**
+  String get registerPasswordLabel;
 
-  /// No description provided for @register_password_label.
+  /// No description provided for @registerPasswordHint.
   ///
-  /// In ru, this message translates to:
-  /// **'Пароль'**
-  String get register_password_label;
+  /// In de, this message translates to:
+  /// **'Mindestens 6 Zeichen'**
+  String get registerPasswordHint;
 
-  /// No description provided for @register_password_hint.
+  /// No description provided for @registerNicknameLabel.
   ///
-  /// In ru, this message translates to:
-  /// **'Минимум 6 символов'**
-  String get register_password_hint;
+  /// In de, this message translates to:
+  /// **'Spitzname (optional)'**
+  String get registerNicknameLabel;
 
-  /// No description provided for @register_nickname_label.
+  /// No description provided for @registerNicknameHint.
   ///
-  /// In ru, this message translates to:
-  /// **'Никнейм (необязательно)'**
-  String get register_nickname_label;
+  /// In de, this message translates to:
+  /// **'Spitznamen eingeben'**
+  String get registerNicknameHint;
 
-  /// No description provided for @register_nickname_hint.
+  /// No description provided for @registerButton.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите никнейм'**
-  String get register_nickname_hint;
+  /// In de, this message translates to:
+  /// **'Konto erstellen'**
+  String get registerButton;
 
-  /// No description provided for @register_button.
+  /// No description provided for @registerHaveAccount.
   ///
-  /// In ru, this message translates to:
-  /// **'Создать аккаунт'**
-  String get register_button;
+  /// In de, this message translates to:
+  /// **'Bereits ein Konto? '**
+  String get registerHaveAccount;
 
-  /// No description provided for @register_have_account.
+  /// No description provided for @registerLogin.
   ///
-  /// In ru, this message translates to:
-  /// **'Уже есть аккаунт? '**
-  String get register_have_account;
+  /// In de, this message translates to:
+  /// **'Anmelden'**
+  String get registerLogin;
 
-  /// No description provided for @register_login.
+  /// No description provided for @dashboardTitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Войти'**
-  String get register_login;
+  /// In de, this message translates to:
+  /// **'Dashboard'**
+  String get dashboardTitle;
 
-  /// No description provided for @dashboard_title.
+  /// No description provided for @dashboardSettings.
   ///
-  /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get dashboard_title;
+  /// In de, this message translates to:
+  /// **'Einstellungen'**
+  String get dashboardSettings;
 
-  /// No description provided for @dashboard_elements_store.
+  /// No description provided for @dashboardLogout.
   ///
-  /// In ru, this message translates to:
-  /// **'Элементы'**
-  String get dashboard_elements_store;
+  /// In de, this message translates to:
+  /// **'Abmelden'**
+  String get dashboardLogout;
 
-  /// No description provided for @dashboard_tab_chats.
+  /// No description provided for @dashboardReport.
   ///
-  /// In ru, this message translates to:
-  /// **'Чаты'**
-  String get dashboard_tab_chats;
+  /// In de, this message translates to:
+  /// **'Fehler melden'**
+  String get dashboardReport;
 
-  /// No description provided for @dashboard_tab_ai.
+  /// No description provided for @dashboardReportHint.
   ///
-  /// In ru, this message translates to:
-  /// **'Ассистент'**
-  String get dashboard_tab_ai;
+  /// In de, this message translates to:
+  /// **'Beschreibe was nicht funktioniert — wir kümmern uns darum.'**
+  String get dashboardReportHint;
 
-  /// No description provided for @dashboard_tab_vpn.
+  /// No description provided for @dashboardAppInfo.
   ///
-  /// In ru, this message translates to:
-  /// **'VPN'**
-  String get dashboard_tab_vpn;
+  /// In de, this message translates to:
+  /// **'App-Info'**
+  String get dashboardAppInfo;
 
-  /// No description provided for @dashboard_app_info.
+  /// No description provided for @dashboardVersionDetails.
   ///
-  /// In ru, this message translates to:
-  /// **'О приложении'**
-  String get dashboard_app_info;
+  /// In de, this message translates to:
+  /// **'Versionsdetails'**
+  String get dashboardVersionDetails;
 
-  /// No description provided for @dashboard_version_details.
+  /// No description provided for @tabChats.
   ///
-  /// In ru, this message translates to:
-  /// **'Детали версии'**
-  String get dashboard_version_details;
+  /// In de, this message translates to:
+  /// **'Chats'**
+  String get tabChats;
 
-  /// No description provided for @dashboard_donations.
+  /// No description provided for @tabAi.
   ///
-  /// In ru, this message translates to:
-  /// **'Поддержка'**
-  String get dashboard_donations;
+  /// In de, this message translates to:
+  /// **'KI-Assistent'**
+  String get tabAi;
 
-  /// No description provided for @dashboard_report.
+  /// No description provided for @tabSchedule.
   ///
-  /// In ru, this message translates to:
-  /// **'Сообщить об ошибке'**
-  String get dashboard_report;
+  /// In de, this message translates to:
+  /// **'Stundenplan'**
+  String get tabSchedule;
 
-  /// No description provided for @dashboard_report_hint.
+  /// No description provided for @tabDashboard.
   ///
-  /// In ru, this message translates to:
-  /// **'Опиши что пошло не так — мы разберёмся.'**
-  String get dashboard_report_hint;
+  /// In de, this message translates to:
+  /// **'Dashboard'**
+  String get tabDashboard;
 
-  /// No description provided for @dashboard_report_placeholder.
+  /// No description provided for @settingsTitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Например: при нажатии на кнопку VPN приложение зависает...'**
-  String get dashboard_report_placeholder;
+  /// In de, this message translates to:
+  /// **'Einstellungen'**
+  String get settingsTitle;
 
-  /// No description provided for @dashboard_report_send.
+  /// No description provided for @settingsTheme.
   ///
-  /// In ru, this message translates to:
-  /// **'Отправить'**
-  String get dashboard_report_send;
+  /// In de, this message translates to:
+  /// **'Design'**
+  String get settingsTheme;
 
-  /// No description provided for @dashboard_report_sent.
+  /// No description provided for @settingsThemeLight.
   ///
-  /// In ru, this message translates to:
-  /// **'Отправлено! Спасибо.'**
-  String get dashboard_report_sent;
+  /// In de, this message translates to:
+  /// **'Hell'**
+  String get settingsThemeLight;
 
-  /// No description provided for @dashboard_settings.
+  /// No description provided for @settingsThemeDark.
   ///
-  /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get dashboard_settings;
+  /// In de, this message translates to:
+  /// **'Dunkel'**
+  String get settingsThemeDark;
 
-  /// No description provided for @dashboard_logout.
+  /// No description provided for @settingsLanguage.
   ///
-  /// In ru, this message translates to:
-  /// **'Выйти'**
-  String get dashboard_logout;
+  /// In de, this message translates to:
+  /// **'Sprache'**
+  String get settingsLanguage;
 
-  /// No description provided for @vpn_title.
+  /// No description provided for @settingsAccount.
   ///
-  /// In ru, this message translates to:
-  /// **'VPN'**
-  String get vpn_title;
+  /// In de, this message translates to:
+  /// **'Konto'**
+  String get settingsAccount;
 
-  /// No description provided for @vpn_connected.
+  /// No description provided for @settingsNotifications.
   ///
-  /// In ru, this message translates to:
-  /// **'Подключено'**
-  String get vpn_connected;
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen'**
+  String get settingsNotifications;
 
-  /// No description provided for @vpn_disconnected.
+  /// No description provided for @settingsLogout.
   ///
-  /// In ru, this message translates to:
-  /// **'Отключено'**
-  String get vpn_disconnected;
+  /// In de, this message translates to:
+  /// **'Abmelden'**
+  String get settingsLogout;
 
-  /// No description provided for @vpn_connecting.
+  /// No description provided for @settingsVersion.
   ///
-  /// In ru, this message translates to:
-  /// **'Подключение...'**
-  String get vpn_connecting;
+  /// In de, this message translates to:
+  /// **'Version'**
+  String get settingsVersion;
 
-  /// No description provided for @vpn_select_server.
+  /// No description provided for @scheduleTitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Выбрать сервер'**
-  String get vpn_select_server;
+  /// In de, this message translates to:
+  /// **'Stundenplan'**
+  String get scheduleTitle;
 
-  /// No description provided for @vpn_split_tunneling.
+  /// No description provided for @scheduleComingSoon.
   ///
-  /// In ru, this message translates to:
-  /// **'Раздельное туннелирование'**
-  String get vpn_split_tunneling;
+  /// In de, this message translates to:
+  /// **'Dein Stundenplan wird bald verfügbar sein.'**
+  String get scheduleComingSoon;
 
-  /// No description provided for @vpn_split_apps.
+  /// No description provided for @pendingTitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Приложения'**
-  String get vpn_split_apps;
+  /// In de, this message translates to:
+  /// **'Konto wird geprüft'**
+  String get pendingTitle;
 
-  /// No description provided for @vpn_split_sites.
+  /// No description provided for @pendingMessage.
   ///
-  /// In ru, this message translates to:
-  /// **'Сайты'**
-  String get vpn_split_sites;
+  /// In de, this message translates to:
+  /// **'Deine Anfrage wird vom Schuladministrator geprüft.'**
+  String get pendingMessage;
 
-  /// No description provided for @vpn_traffic_in.
+  /// No description provided for @pendingAvailable.
   ///
-  /// In ru, this message translates to:
-  /// **'Входящий'**
-  String get vpn_traffic_in;
+  /// In de, this message translates to:
+  /// **'Du kannst bereits mit Freunden chatten!'**
+  String get pendingAvailable;
 
-  /// No description provided for @vpn_traffic_out.
+  /// No description provided for @comingSoon.
   ///
-  /// In ru, this message translates to:
-  /// **'Исходящий'**
-  String get vpn_traffic_out;
+  /// In de, this message translates to:
+  /// **'Demnächst verfügbar'**
+  String get comingSoon;
 
-  /// No description provided for @vpn_access_title.
+  /// No description provided for @comingSoonAi.
   ///
-  /// In ru, this message translates to:
-  /// **'Требуется доступ'**
-  String get vpn_access_title;
+  /// In de, this message translates to:
+  /// **'KI-Assistent wird entwickelt'**
+  String get comingSoonAi;
 
-  /// No description provided for @vpn_access_subtitle.
+  /// No description provided for @comingSoonChats.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите код активации VPN'**
-  String get vpn_access_subtitle;
+  /// In de, this message translates to:
+  /// **'Chats kommen bald'**
+  String get comingSoonChats;
 
-  /// No description provided for @vpn_access_hint.
+  /// No description provided for @errorNetwork.
   ///
-  /// In ru, this message translates to:
-  /// **'Код активации'**
-  String get vpn_access_hint;
+  /// In de, this message translates to:
+  /// **'Netzwerkfehler'**
+  String get errorNetwork;
 
-  /// No description provided for @vpn_access_button.
+  /// No description provided for @errorUnknown.
   ///
-  /// In ru, this message translates to:
-  /// **'Активировать'**
-  String get vpn_access_button;
+  /// In de, this message translates to:
+  /// **'Unbekannter Fehler'**
+  String get errorUnknown;
 
-  /// No description provided for @settings_title.
+  /// No description provided for @buttonOk.
   ///
-  /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get settings_title;
+  /// In de, this message translates to:
+  /// **'OK'**
+  String get buttonOk;
 
-  /// No description provided for @settings_theme.
+  /// No description provided for @buttonCancel.
   ///
-  /// In ru, this message translates to:
-  /// **'Тема'**
-  String get settings_theme;
+  /// In de, this message translates to:
+  /// **'Abbrechen'**
+  String get buttonCancel;
 
-  /// No description provided for @settings_theme_light.
+  /// No description provided for @buttonSave.
   ///
-  /// In ru, this message translates to:
-  /// **'Светлая'**
-  String get settings_theme_light;
+  /// In de, this message translates to:
+  /// **'Speichern'**
+  String get buttonSave;
 
-  /// No description provided for @settings_theme_dark.
+  /// No description provided for @buttonClose.
   ///
-  /// In ru, this message translates to:
-  /// **'Тёмная'**
-  String get settings_theme_dark;
+  /// In de, this message translates to:
+  /// **'Schließen'**
+  String get buttonClose;
 
-  /// No description provided for @settings_language.
+  /// No description provided for @sandboxLimitChats.
   ///
-  /// In ru, this message translates to:
-  /// **'Язык'**
-  String get settings_language;
+  /// In de, this message translates to:
+  /// **'Nach Schulverifizierung verfügbar'**
+  String get sandboxLimitChats;
 
-  /// No description provided for @settings_account.
+  /// No description provided for @sandboxLimitSchedule.
   ///
-  /// In ru, this message translates to:
-  /// **'Аккаунт'**
-  String get settings_account;
+  /// In de, this message translates to:
+  /// **'Nach Schulverifizierung verfügbar'**
+  String get sandboxLimitSchedule;
 
-  /// No description provided for @settings_premium.
+  /// No description provided for @sandboxLimitPasswordVault.
   ///
-  /// In ru, this message translates to:
-  /// **'Подписка'**
-  String get settings_premium;
+  /// In de, this message translates to:
+  /// **'Nach Elternverknüpfung verfügbar'**
+  String get sandboxLimitPasswordVault;
 
-  /// No description provided for @settings_activate_code.
+  /// No description provided for @sandboxDailyLimitReached.
   ///
-  /// In ru, this message translates to:
-  /// **'Введите код активации'**
-  String get settings_activate_code;
+  /// In de, this message translates to:
+  /// **'Tageslimit erreicht. Bis morgen!'**
+  String get sandboxDailyLimitReached;
 
-  /// No description provided for @settings_activate_button.
+  /// No description provided for @curfewTitle.
   ///
-  /// In ru, this message translates to:
-  /// **'Активировать'**
-  String get settings_activate_button;
+  /// In de, this message translates to:
+  /// **'Gute Nacht!'**
+  String get curfewTitle;
 
-  /// No description provided for @coming_soon.
+  /// No description provided for @curfewMessage.
   ///
-  /// In ru, this message translates to:
-  /// **'Скоро'**
-  String get coming_soon;
+  /// In de, this message translates to:
+  /// **'Die App ist bis morgen früh gesperrt.'**
+  String get curfewMessage;
 
-  /// No description provided for @coming_soon_ai.
+  /// No description provided for @loginPrimaryButton.
   ///
-  /// In ru, this message translates to:
-  /// **'ИИ-ассистент в разработке'**
-  String get coming_soon_ai;
-
-  /// No description provided for @coming_soon_chats.
-  ///
-  /// In ru, this message translates to:
-  /// **'Чаты скоро будут доступны'**
-  String get coming_soon_chats;
-
-  /// No description provided for @error_network.
-  ///
-  /// In ru, this message translates to:
-  /// **'Ошибка сети'**
-  String get error_network;
-
-  /// No description provided for @error_unknown.
-  ///
-  /// In ru, this message translates to:
-  /// **'Неизвестная ошибка'**
-  String get error_unknown;
-
-  /// No description provided for @button_ok.
-  ///
-  /// In ru, this message translates to:
-  /// **'Понятно'**
-  String get button_ok;
-
-  /// No description provided for @button_cancel.
-  ///
-  /// In ru, this message translates to:
-  /// **'Отмена'**
-  String get button_cancel;
-
-  /// No description provided for @button_save.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сохранить'**
-  String get button_save;
-
-  /// No description provided for @button_close.
-  ///
-  /// In ru, this message translates to:
-  /// **'Закрыть'**
-  String get button_close;
-
-  /// No description provided for @dashboard_donations_text.
-  ///
-  /// In ru, this message translates to:
-  /// **'Поддержи проект — донаты помогают V-Talk оставаться бесплатным.'**
-  String get dashboard_donations_text;
-
-  /// No description provided for @tab_chats.
-  ///
-  /// In ru, this message translates to:
-  /// **'Чаты'**
-  String get tab_chats;
-
-  /// No description provided for @tab_ai.
-  ///
-  /// In ru, this message translates to:
-  /// **'Ассистент'**
-  String get tab_ai;
-
-  /// No description provided for @tab_vpn.
-  ///
-  /// In ru, this message translates to:
-  /// **'VPN'**
-  String get tab_vpn;
-
-  /// No description provided for @tab_dashboard.
-  ///
-  /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get tab_dashboard;
-
-  /// No description provided for @settings_notifications.
-  ///
-  /// In ru, this message translates to:
-  /// **'Уведомления'**
-  String get settings_notifications;
-
-  /// No description provided for @settings_logout.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выйти'**
-  String get settings_logout;
-
-  /// No description provided for @settings_version.
-  ///
-  /// In ru, this message translates to:
-  /// **'Версия'**
-  String get settings_version;
+  /// In de, this message translates to:
+  /// **'Weiter'**
+  String get loginPrimaryButton;
 }
 
 class _AppLocalizationsDelegate

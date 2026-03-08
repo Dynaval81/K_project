@@ -9,271 +9,227 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get login_title => 'Вход';
+  String get splashTagline => 'Verbinde deine Schulwelt';
 
   @override
-  String get login_subtitle => 'Войдите в свой аккаунт';
+  String get loginTitle => 'Anmelden';
 
   @override
-  String get login_method_email => 'Email';
+  String get loginSubtitle => 'Melde dich bei deinem Konto an';
 
   @override
-  String get login_method_vtalk_id => 'V-Talk ID';
+  String get loginMethodEmail => 'E-Mail';
 
   @override
-  String get login_method_nickname => 'Никнейм';
+  String get loginHintEmail => 'E-Mail eingeben';
 
   @override
-  String get login_label => 'Логин';
+  String get loginPasswordLabel => 'Passwort';
 
   @override
-  String get login_hint_email => 'Введите email';
+  String get loginPasswordHint => 'Passwort eingeben';
 
   @override
-  String get login_hint_vtalk_id => 'Введите V-Talk ID';
+  String get loginEnterPassword => 'Passwort eingeben';
 
   @override
-  String get login_hint_nickname => 'Введите никнейм';
+  String get loginButtonLogin => 'Anmelden';
 
   @override
-  String get login_primary_button => 'Поехали';
+  String get loginForgotPassword => 'Passwort vergessen?';
 
   @override
-  String get login_divider_or => 'или';
+  String get loginDividerOr => 'oder';
 
   @override
-  String get login_google => 'Войти через Google';
+  String get loginGoogle => 'Mit Google anmelden';
 
   @override
-  String get login_apple => 'Войти через Apple';
+  String get loginApple => 'Mit Apple anmelden';
 
   @override
-  String get login_no_account => 'Нет аккаунта? ';
+  String get loginGoogleSoon => 'Google Sign-In — demnächst verfügbar';
 
   @override
-  String get login_register => 'Зарегистрироваться';
+  String get loginAppleSoon => 'Apple Sign-In — demnächst verfügbar';
 
   @override
-  String get login_password_label => 'Пароль';
+  String get loginNoAccount => 'Kein Konto? ';
 
   @override
-  String get login_password_hint => 'Введите пароль';
+  String get loginRegister => 'Registrieren';
 
   @override
-  String get login_button_submit => 'Войти';
+  String get loginErrorEmpty => 'E-Mail oder Nutzername eingeben';
 
   @override
-  String get login_forgot_password => 'Забыли пароль?';
+  String get loginErrorEmptyPassword => 'Bitte Passwort eingeben';
 
   @override
-  String get login_change_identifier => 'изменить';
+  String get loginErrorNetwork => 'Netzwerkfehler. Bitte erneut versuchen.';
 
   @override
-  String get login_error_empty => 'Введите email, VT-ID или никнейм';
+  String get loginErrorEmailVerification =>
+      'Bitte bestätige deine E-Mail vor dem Login';
 
   @override
-  String get login_error_empty_password => 'Введите пароль';
+  String get loginErrorGeneric => 'Anmeldefehler. Bitte erneut versuchen.';
 
   @override
-  String get login_error_network => 'Ошибка сети';
+  String get registerTitle => 'Registrieren';
 
   @override
-  String get register_title => 'Регистрация';
+  String get registerSubtitle => 'Konto erstellen';
 
   @override
-  String get register_subtitle => 'Создайте аккаунт';
+  String get registerEmailLabel => 'E-Mail';
 
   @override
-  String get register_email_label => 'Email';
+  String get registerEmailHint => 'E-Mail eingeben';
 
   @override
-  String get register_email_hint => 'Введите email';
+  String get registerPasswordLabel => 'Passwort';
 
   @override
-  String get register_password_label => 'Пароль';
+  String get registerPasswordHint => 'Mindestens 6 Zeichen';
 
   @override
-  String get register_password_hint => 'Минимум 6 символов';
+  String get registerNicknameLabel => 'Spitzname (optional)';
 
   @override
-  String get register_nickname_label => 'Никнейм (необязательно)';
+  String get registerNicknameHint => 'Spitznamen eingeben';
 
   @override
-  String get register_nickname_hint => 'Введите никнейм';
+  String get registerButton => 'Konto erstellen';
 
   @override
-  String get register_button => 'Создать аккаунт';
+  String get registerHaveAccount => 'Bereits ein Konto? ';
 
   @override
-  String get register_have_account => 'Уже есть аккаунт? ';
+  String get registerLogin => 'Anmelden';
 
   @override
-  String get register_login => 'Войти';
+  String get dashboardTitle => 'Dashboard';
 
   @override
-  String get dashboard_title => 'Настройки';
+  String get dashboardSettings => 'Einstellungen';
 
   @override
-  String get dashboard_elements_store => 'Элементы';
+  String get dashboardLogout => 'Abmelden';
 
   @override
-  String get dashboard_tab_chats => 'Чаты';
+  String get dashboardReport => 'Fehler melden';
 
   @override
-  String get dashboard_tab_ai => 'Ассистент';
+  String get dashboardReportHint =>
+      'Beschreibe was nicht funktioniert — wir kümmern uns darum.';
 
   @override
-  String get dashboard_tab_vpn => 'VPN';
+  String get dashboardAppInfo => 'App-Info';
 
   @override
-  String get dashboard_app_info => 'О приложении';
+  String get dashboardVersionDetails => 'Versionsdetails';
 
   @override
-  String get dashboard_version_details => 'Детали версии';
+  String get tabChats => 'Chats';
 
   @override
-  String get dashboard_donations => 'Поддержка';
+  String get tabAi => 'KI-Assistent';
 
   @override
-  String get dashboard_report => 'Сообщить об ошибке';
+  String get tabSchedule => 'Stundenplan';
 
   @override
-  String get dashboard_report_hint => 'Опиши что пошло не так — мы разберёмся.';
+  String get tabDashboard => 'Dashboard';
 
   @override
-  String get dashboard_report_placeholder =>
-      'Например: при нажатии на кнопку VPN приложение зависает...';
+  String get settingsTitle => 'Einstellungen';
 
   @override
-  String get dashboard_report_send => 'Отправить';
+  String get settingsTheme => 'Design';
 
   @override
-  String get dashboard_report_sent => 'Отправлено! Спасибо.';
+  String get settingsThemeLight => 'Hell';
 
   @override
-  String get dashboard_settings => 'Настройки';
+  String get settingsThemeDark => 'Dunkel';
 
   @override
-  String get dashboard_logout => 'Выйти';
+  String get settingsLanguage => 'Sprache';
 
   @override
-  String get vpn_title => 'VPN';
+  String get settingsAccount => 'Konto';
 
   @override
-  String get vpn_connected => 'Подключено';
+  String get settingsNotifications => 'Benachrichtigungen';
 
   @override
-  String get vpn_disconnected => 'Отключено';
+  String get settingsLogout => 'Abmelden';
 
   @override
-  String get vpn_connecting => 'Подключение...';
+  String get settingsVersion => 'Version';
 
   @override
-  String get vpn_select_server => 'Выбрать сервер';
+  String get scheduleTitle => 'Stundenplan';
 
   @override
-  String get vpn_split_tunneling => 'Раздельное туннелирование';
+  String get scheduleComingSoon => 'Dein Stundenplan wird bald verfügbar sein.';
 
   @override
-  String get vpn_split_apps => 'Приложения';
+  String get pendingTitle => 'Konto wird geprüft';
 
   @override
-  String get vpn_split_sites => 'Сайты';
+  String get pendingMessage =>
+      'Deine Anfrage wird vom Schuladministrator geprüft.';
 
   @override
-  String get vpn_traffic_in => 'Входящий';
+  String get pendingAvailable => 'Du kannst bereits mit Freunden chatten!';
 
   @override
-  String get vpn_traffic_out => 'Исходящий';
+  String get comingSoon => 'Demnächst verfügbar';
 
   @override
-  String get vpn_access_title => 'Требуется доступ';
+  String get comingSoonAi => 'KI-Assistent wird entwickelt';
 
   @override
-  String get vpn_access_subtitle => 'Введите код активации VPN';
+  String get comingSoonChats => 'Chats kommen bald';
 
   @override
-  String get vpn_access_hint => 'Код активации';
+  String get errorNetwork => 'Netzwerkfehler';
 
   @override
-  String get vpn_access_button => 'Активировать';
+  String get errorUnknown => 'Unbekannter Fehler';
 
   @override
-  String get settings_title => 'Настройки';
+  String get buttonOk => 'OK';
 
   @override
-  String get settings_theme => 'Тема';
+  String get buttonCancel => 'Abbrechen';
 
   @override
-  String get settings_theme_light => 'Светлая';
+  String get buttonSave => 'Speichern';
 
   @override
-  String get settings_theme_dark => 'Тёмная';
+  String get buttonClose => 'Schließen';
 
   @override
-  String get settings_language => 'Язык';
+  String get sandboxLimitChats => 'Nach Schulverifizierung verfügbar';
 
   @override
-  String get settings_account => 'Аккаунт';
+  String get sandboxLimitSchedule => 'Nach Schulverifizierung verfügbar';
 
   @override
-  String get settings_premium => 'Подписка';
+  String get sandboxLimitPasswordVault => 'Nach Elternverknüpfung verfügbar';
 
   @override
-  String get settings_activate_code => 'Введите код активации';
+  String get sandboxDailyLimitReached => 'Tageslimit erreicht. Bis morgen!';
 
   @override
-  String get settings_activate_button => 'Активировать';
+  String get curfewTitle => 'Gute Nacht!';
 
   @override
-  String get coming_soon => 'Скоро';
+  String get curfewMessage => 'Die App ist bis morgen früh gesperrt.';
 
   @override
-  String get coming_soon_ai => 'ИИ-ассистент в разработке';
-
-  @override
-  String get coming_soon_chats => 'Чаты скоро будут доступны';
-
-  @override
-  String get error_network => 'Ошибка сети';
-
-  @override
-  String get error_unknown => 'Неизвестная ошибка';
-
-  @override
-  String get button_ok => 'Понятно';
-
-  @override
-  String get button_cancel => 'Отмена';
-
-  @override
-  String get button_save => 'Сохранить';
-
-  @override
-  String get button_close => 'Закрыть';
-
-  @override
-  String get dashboard_donations_text =>
-      'Поддержи проект — донаты помогают V-Talk оставаться бесплатным.';
-
-  @override
-  String get tab_chats => 'Чаты';
-
-  @override
-  String get tab_ai => 'Ассистент';
-
-  @override
-  String get tab_vpn => 'VPN';
-
-  @override
-  String get tab_dashboard => 'Настройки';
-
-  @override
-  String get settings_notifications => 'Уведомления';
-
-  @override
-  String get settings_logout => 'Выйти';
-
-  @override
-  String get settings_version => 'Версия';
+  String get loginPrimaryButton => 'Weiter';
 }

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:knoty/core/constants.dart';
 import 'package:knoty/core/constants/app_constants.dart';
 import 'package:knoty/core/controllers/auth_controller.dart';
+import 'package:knoty/l10n/app_localizations.dart';
 
-/// HAI3 Zen Splash — бесшовный переход, дыхание логотипа, фирменный тэглайн.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -18,7 +17,6 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _entryController;
   late final Animation<double> _fadeIn;
   late final Animation<double> _slideUp;
-
   late final AnimationController _breathController;
   late final Animation<double> _breathScale;
 
@@ -73,6 +71,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -80,64 +80,39 @@ class _SplashScreenState extends State<SplashScreen>
           Center(
             child: AnimatedBuilder(
               animation: _entryController,
-              builder: (context, child) {
-                return FadeTransition(
-                  opacity: _fadeIn,
-                  child: Transform.translate(
-                    offset: Offset(0, _slideUp.value),
-                    child: child,
-                  ),
-                );
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ScaleTransition(
-                    scale: _breathScale,
-                    child: Image.asset(
-                      'assets/images/logo_bnb.png',
-                      width: 96,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    AppConstants.appName,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w200,
-                      letterSpacing: 10,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
+              builder: (context, child) => FadeTransition(
+                opacity: _fadeIn,
+                child: Transform.translate(
+                  offset: Offset(0, _slideUp.value),
+                  child: child,
+                ),
+              ),
+              child: ScaleTransition(
+                scale: _breathScale,
+                child: Image.asset(
+                  'assets/images/knoty_logo.png',
+                  width: 180,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
+
+          // Tagline bottom
           Positioned(
             bottom: 48,
             left: 0,
             right: 0,
             child: FadeTransition(
               opacity: _fadeIn,
-              child: Column(
-                children: [
-                  Image.asset(
-                    'assets/images/hai_3_light.png',
-                    width: 72,
-                    fit: BoxFit.contain,
-                    color: AppColors.primary.withOpacity(0.25),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Crafted by the canons of digital zen',
-                    style: TextStyle(
-                      fontSize: 11,
-                      letterSpacing: 0.4,
-                      color: AppColors.onSurfaceVariant.withOpacity(0.6),
-                    ),
-                  ),
-                ],
+              child: Text(
+                l10n.splashTagline,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 12,
+                  letterSpacing: 0.4,
+                  color: Color(0xFFAAAAAA),
+                ),
               ),
             ),
           ),

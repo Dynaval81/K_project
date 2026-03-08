@@ -1,8 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:knoty/constants/app_colors.dart';
-import 'package:knoty/core/controllers/auth_controller.dart';
 import 'package:knoty/core/controllers/tab_visibility_controller.dart';
 import 'package:knoty/presentation/screens/ai/ai_assistant_screen.dart';
 import 'package:knoty/presentation/screens/chats_screen.dart';
@@ -57,15 +54,17 @@ class _MainNavShellState extends State<MainNavShell> {
   @override
   Widget build(BuildContext context) {
     final tabVisibility = context.watch<TabVisibilityController>();
-    final showAi = tabVisibility.showAiTab;
     final showChats = tabVisibility.showChatsTab;
+    final showAi = tabVisibility.showAiTab;
+    final showSchedule = tabVisibility.showScheduleTab;
 
     final activeTabs = <_TabItem>[
       if (showChats)
         const _TabItem(icon: Icons.chat_bubble_outline_rounded, label: 'Chats', id: 'chats'),
       if (showAi)
         const _TabItem(icon: Icons.psychology_rounded, label: 'KI', id: 'ai'),
-      const _TabItem(icon: Icons.calendar_today_rounded, label: 'Stundenplan', id: 'schedule'),
+      if (showSchedule)
+        const _TabItem(icon: Icons.calendar_today_rounded, label: 'Stundenplan', id: 'schedule'),
       const _TabItem(icon: Icons.dashboard_rounded, label: 'Dashboard', id: 'dashboard'),
     ];
 
@@ -77,31 +76,30 @@ class _MainNavShellState extends State<MainNavShell> {
       });
     }
 
+    // If active tab was hidden, fall back to dashboard
     final activeTabVisible = activeTabs.any((t) => t.id == _activeTabId);
     if (!activeTabVisible) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {
-            _activeTabId = 'chats';
-            _currentIndex = _getFixedIndex('chats');
+            _activeTabId = 'dashboard';
+            _currentIndex = _getFixedIndex('dashboard');
           });
         }
       });
     }
 
     return Scaffold(
-      body: Stack(
-        children: [
-          IndexedStack(
-            index: _currentIndex,
-            children: _allScreens,
-          ),
-        ],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _allScreens,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.12))),
+          border: Border(
+            top: BorderSide(color: Colors.grey.withOpacity(0.12)),
+          ),
         ),
         child: BottomNavigationBar(
           currentIndex: activeTabs
@@ -112,8 +110,8 @@ class _MainNavShellState extends State<MainNavShell> {
           backgroundColor: Colors.white,
           selectedItemColor: const Color(0xFFE6B800),
           unselectedItemColor: Colors.grey,
-          selectedFontSize: 14,
-          unselectedFontSize: 14,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
           items: activeTabs
               .map((t) => BottomNavigationBarItem(
                     key: ValueKey(t.id),

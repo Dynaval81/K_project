@@ -1,3 +1,5 @@
+import 'package:knoty/core/enums/verification_level.dart';
+
 class User {
   final String id;
   final String username;
@@ -14,6 +16,7 @@ class User {
   final String? status;
   final String? matrixUserId;
   final DateTime? createdAt;
+  final VerificationLevel verificationLevel;
 
   User({
     required this.id,
@@ -31,6 +34,7 @@ class User {
     this.status,
     this.matrixUserId,
     this.createdAt,
+    this.verificationLevel = VerificationLevel.none,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -46,6 +50,21 @@ class User {
     // Нормализуем vtNumber — убираем VT- префикс если бэкенд его присылает
     final rawVt = json['vtNumber']?.toString() ?? '';
     final vtClean = rawVt.startsWith('VT-') ? rawVt.substring(3) : rawVt;
+
+    // Parse verificationLevel
+    VerificationLevel _parseVerificationLevel(dynamic val) {
+      if (val == null) return VerificationLevel.none;
+      final levelStr = val.toString().toLowerCase();
+      switch (levelStr) {
+        case 'verified':
+          return VerificationLevel.verified;
+        case 'sandbox':
+          return VerificationLevel.sandbox;
+        case 'none':
+        default:
+          return VerificationLevel.none;
+      }
+    }
 
     return User(
       id: json['id']?.toString() ?? '',
@@ -63,6 +82,7 @@ class User {
       status: json['status']?.toString(),
       matrixUserId: json['matrixUserId']?.toString(),
       createdAt: _parseDate(json['createdAt']),
+      verificationLevel: _parseVerificationLevel(json['verificationLevel']),
     );
   }
 
@@ -81,6 +101,9 @@ class User {
     if (aiExpiresAt == null) return true;
     return DateTime.now().isBefore(aiExpiresAt!);
   }
+
+  /// Returns true if user is in sandbox mode (restricted access)
+  bool get isRestricted => verificationLevel == VerificationLevel.sandbox;
 
   String get premiumStatus {
     if (isPremium) return 'Premium активен';
@@ -116,6 +139,7 @@ class User {
     'status': status,
     'matrixUserId': matrixUserId,
     'createdAt': createdAt?.toIso8601String(),
+    'verificationLevel': verificationLevel.name,
   };
 
   User copyWith({
@@ -134,6 +158,7 @@ class User {
     String? status,
     String? matrixUserId,
     DateTime? createdAt,
+    VerificationLevel? verificationLevel,
   }) {
     return User(
       id: id ?? this.id,
@@ -151,6 +176,7 @@ class User {
       status: status ?? this.status,
       matrixUserId: matrixUserId ?? this.matrixUserId,
       createdAt: createdAt ?? this.createdAt,
+      verificationLevel: verificationLevel ?? this.verificationLevel,
     );
   }
 }

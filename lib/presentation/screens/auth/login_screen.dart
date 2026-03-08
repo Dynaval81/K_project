@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen>
   void _goToPassword() {
     final identifier = _loginController.text.trim();
     if (identifier.isEmpty) {
-      _showError(AppLocalizations.of(context)!.login_hint_email);
+      _showError(AppLocalizations.of(context)!.loginErrorEmpty);
       return;
     }
     setState(() => _step = 1);
@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen>
     final password = _passwordController.text;
 
     if (password.isEmpty) {
-      _showError('Введите пароль');
+      _showError(AppLocalizations.of(context)!.loginEnterPassword);
       return;
     }
 
@@ -109,14 +109,14 @@ class _LoginScreenState extends State<LoginScreen>
       if (result.success) {
         context.go(AppRoutes.home);
       } else if (result.isEmailNotVerified) {
-        _showError('Подтвердите email перед входом');
+        _showError(AppLocalizations.of(context)!.loginErrorEmailVerification);
         _goBack();
       } else {
-        _showError(result.error ?? 'Ошибка входа');
+        _showError(result.error ?? AppLocalizations.of(context)!.loginErrorGeneric);
         _goBack();
       }
     } catch (e) {
-      if (mounted) _showError('Ошибка сети');
+      if (mounted) _showError(AppLocalizations.of(context)!.loginErrorNetwork);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -138,10 +138,10 @@ class _LoginScreenState extends State<LoginScreen>
 
   String _getLoginHint(AppLocalizations l10n) {
     switch (_loginMethodIndex) {
-      case 0: return l10n.login_hint_nickname;
-      case 1: return l10n.login_hint_vtalk_id;
-      case 2: return l10n.login_hint_email;
-      default: return l10n.login_hint_nickname;
+      case 0: return 'Spitzname';
+      case 1: return 'Knoty-ID';
+      case 2: return l10n.loginHintEmail;
+      default: return 'Spitzname';
     }
   }
 
@@ -247,8 +247,8 @@ class _LoginScreenState extends State<LoginScreen>
                                 )
                               : Text(
                                   _step == 0
-                                      ? l10n.login_primary_button
-                                      : 'Войти',
+                                      ? AppLocalizations.of(context)!.loginPrimaryButton
+                                      : AppLocalizations.of(context)!.loginButtonLogin,
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold),
@@ -256,11 +256,11 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
 
                         const SizedBox(height: 24),
-                        _ZenDivider(label: l10n.login_divider_or),
+                        _ZenDivider(label: AppLocalizations.of(context)!.loginDividerOr),
                         const SizedBox(height: 24),
 
                         _ZenButton(
-                          onPressed: () => _showError('Google Sign-In — скоро'),
+                          onPressed: () => _showError(AppLocalizations.of(context)!.loginGoogleSoon),
                           backgroundColor: Colors.white,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -268,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen>
                               Icon(Icons.g_mobiledata_rounded,
                                   color: AppColors.onSurface, size: 32),
                               const SizedBox(width: 4),
-                              Text(l10n.login_google,
+                              Text(AppLocalizations.of(context)!.loginGoogle,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500)),
                             ],
@@ -276,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         const SizedBox(height: 12),
                         _ZenButton(
-                          onPressed: () => _showError('Apple Sign-In — скоро'),
+                          onPressed: () => _showError(AppLocalizations.of(context)!.loginAppleSoon),
                           backgroundColor: AppColors.onSurface,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen>
                               const Icon(Icons.apple,
                                   color: Colors.white, size: 22),
                               const SizedBox(width: 8),
-                              Text(l10n.login_apple,
+                              Text(AppLocalizations.of(context)!.loginApple,
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500)),
@@ -323,9 +323,9 @@ class _LoginScreenState extends State<LoginScreen>
                                 style: const TextStyle(
                                     color: Colors.grey, fontSize: 14),
                                 children: [
-                                  TextSpan(text: l10n.login_no_account),
+                                  TextSpan(text: AppLocalizations.of(context)!.loginNoAccount),
                                   TextSpan(
-                                    text: l10n.login_register,
+                                    text: AppLocalizations.of(context)!.loginRegister,
                                     style: TextStyle(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
@@ -357,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen>
         AiryInputField(
           controller: _loginController,
           focusNode: _loginFocus,
-          label: l10n.login_label,
+          label: 'Login',
           hint: _getLoginHint(l10n),
           keyboardType: _getKeyboardType(),
           onSubmitted: (_) => _goToPassword(),
@@ -366,9 +366,9 @@ class _LoginScreenState extends State<LoginScreen>
         _MethodSelector(
           selected: _loginMethodIndex,
           labels: [
-            l10n.login_method_nickname,
-            l10n.login_method_vtalk_id,
-            l10n.login_method_email,
+            'Spitzname',
+            'Knoty-ID',
+            l10n.loginMethodEmail,
           ],
           onSelect: _selectMethod,
         ),
@@ -418,8 +418,8 @@ class _LoginScreenState extends State<LoginScreen>
         AiryInputField(
           controller: _passwordController,
           focusNode: _passwordFocus,
-          label: 'Пароль',
-          hint: '••••••••',
+          label: AppLocalizations.of(context)!.loginPasswordLabel,
+          hint: AppLocalizations.of(context)!.loginPasswordHint,
           obscureText: _obscurePassword,
           keyboardType: TextInputType.visiblePassword,
           onSubmitted: (_) => _onLogin(),

@@ -9,272 +9,227 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get login_title => 'Anmelden';
+  String get splashTagline => 'Verbinde deine Schulwelt';
 
   @override
-  String get login_subtitle => 'Melde dich bei deinem Konto an';
+  String get loginTitle => 'Anmelden';
 
   @override
-  String get login_method_email => 'E-Mail';
+  String get loginSubtitle => 'Melde dich bei deinem Konto an';
 
   @override
-  String get login_method_vtalk_id => 'V-Talk ID';
+  String get loginMethodEmail => 'E-Mail';
 
   @override
-  String get login_method_nickname => 'Spitzname';
+  String get loginHintEmail => 'E-Mail eingeben';
 
   @override
-  String get login_label => 'Login';
+  String get loginPasswordLabel => 'Passwort';
 
   @override
-  String get login_hint_email => 'E-Mail eingeben';
+  String get loginPasswordHint => 'Passwort eingeben';
 
   @override
-  String get login_hint_vtalk_id => 'V-Talk ID eingeben';
+  String get loginEnterPassword => 'Passwort eingeben';
 
   @override
-  String get login_hint_nickname => 'Spitznamen eingeben';
+  String get loginButtonLogin => 'Anmelden';
 
   @override
-  String get login_primary_button => 'Los geht\'s';
+  String get loginForgotPassword => 'Passwort vergessen?';
 
   @override
-  String get login_divider_or => 'oder';
+  String get loginDividerOr => 'oder';
 
   @override
-  String get login_google => 'Mit Google anmelden';
+  String get loginGoogle => 'Mit Google anmelden';
 
   @override
-  String get login_apple => 'Mit Apple anmelden';
+  String get loginApple => 'Mit Apple anmelden';
 
   @override
-  String get login_no_account => 'Kein Konto? ';
+  String get loginGoogleSoon => 'Google Sign-In — demnächst verfügbar';
 
   @override
-  String get login_register => 'Registrieren';
+  String get loginAppleSoon => 'Apple Sign-In — demnächst verfügbar';
 
   @override
-  String get login_password_label => 'Passwort';
+  String get loginNoAccount => 'Kein Konto? ';
 
   @override
-  String get login_password_hint => 'Passwort eingeben';
+  String get loginRegister => 'Registrieren';
 
   @override
-  String get login_button_submit => 'Anmelden';
+  String get loginErrorEmpty => 'E-Mail oder Nutzername eingeben';
 
   @override
-  String get login_forgot_password => 'Passwort vergessen?';
+  String get loginErrorEmptyPassword => 'Bitte Passwort eingeben';
 
   @override
-  String get login_change_identifier => 'Ändern';
+  String get loginErrorNetwork => 'Netzwerkfehler. Bitte erneut versuchen.';
 
   @override
-  String get login_error_empty => 'E-Mail, VT-ID oder Nutzername eingeben';
+  String get loginErrorEmailVerification =>
+      'Bitte bestätige deine E-Mail vor dem Login';
 
   @override
-  String get login_error_empty_password => 'Bitte Passwort eingeben';
+  String get loginErrorGeneric => 'Anmeldefehler. Bitte erneut versuchen.';
 
   @override
-  String get login_error_network => 'Netzwerkfehler';
+  String get registerTitle => 'Registrieren';
 
   @override
-  String get register_title => 'Registrieren';
+  String get registerSubtitle => 'Konto erstellen';
 
   @override
-  String get register_subtitle => 'Konto erstellen';
+  String get registerEmailLabel => 'E-Mail';
 
   @override
-  String get register_email_label => 'E-Mail';
+  String get registerEmailHint => 'E-Mail eingeben';
 
   @override
-  String get register_email_hint => 'E-Mail eingeben';
+  String get registerPasswordLabel => 'Passwort';
 
   @override
-  String get register_password_label => 'Passwort';
+  String get registerPasswordHint => 'Mindestens 6 Zeichen';
 
   @override
-  String get register_password_hint => 'Mindestens 6 Zeichen';
+  String get registerNicknameLabel => 'Spitzname (optional)';
 
   @override
-  String get register_nickname_label => 'Spitzname (optional)';
+  String get registerNicknameHint => 'Spitznamen eingeben';
 
   @override
-  String get register_nickname_hint => 'Spitznamen eingeben';
+  String get registerButton => 'Konto erstellen';
 
   @override
-  String get register_button => 'Konto erstellen';
+  String get registerHaveAccount => 'Bereits ein Konto? ';
 
   @override
-  String get register_have_account => 'Bereits ein Konto? ';
+  String get registerLogin => 'Anmelden';
 
   @override
-  String get register_login => 'Anmelden';
+  String get dashboardTitle => 'Dashboard';
 
   @override
-  String get dashboard_title => 'Einstellungen';
+  String get dashboardSettings => 'Einstellungen';
 
   @override
-  String get dashboard_elements_store => 'Elemente';
+  String get dashboardLogout => 'Abmelden';
 
   @override
-  String get dashboard_tab_chats => 'Chats';
+  String get dashboardReport => 'Fehler melden';
 
   @override
-  String get dashboard_tab_ai => 'Assistent';
-
-  @override
-  String get dashboard_tab_vpn => 'VPN';
-
-  @override
-  String get dashboard_app_info => 'App-Info';
-
-  @override
-  String get dashboard_version_details => 'Versionsdetails';
-
-  @override
-  String get dashboard_donations => 'Unterstützung';
-
-  @override
-  String get dashboard_report => 'Fehler melden';
-
-  @override
-  String get dashboard_report_hint =>
+  String get dashboardReportHint =>
       'Beschreibe was nicht funktioniert — wir kümmern uns darum.';
 
   @override
-  String get dashboard_report_placeholder =>
-      'z.B. App stürzt ab wenn ich auf VPN tippe...';
+  String get dashboardAppInfo => 'App-Info';
 
   @override
-  String get dashboard_report_send => 'Senden';
+  String get dashboardVersionDetails => 'Versionsdetails';
 
   @override
-  String get dashboard_report_sent => 'Gesendet! Danke.';
+  String get tabChats => 'Chats';
 
   @override
-  String get dashboard_settings => 'Einstellungen';
+  String get tabAi => 'KI-Assistent';
 
   @override
-  String get dashboard_logout => 'Abmelden';
+  String get tabSchedule => 'Stundenplan';
 
   @override
-  String get vpn_title => 'VPN';
+  String get tabDashboard => 'Dashboard';
 
   @override
-  String get vpn_connected => 'Verbunden';
+  String get settingsTitle => 'Einstellungen';
 
   @override
-  String get vpn_disconnected => 'Getrennt';
+  String get settingsTheme => 'Design';
 
   @override
-  String get vpn_connecting => 'Verbinde...';
+  String get settingsThemeLight => 'Hell';
 
   @override
-  String get vpn_select_server => 'Server auswählen';
+  String get settingsThemeDark => 'Dunkel';
 
   @override
-  String get vpn_split_tunneling => 'Split-Tunneling';
+  String get settingsLanguage => 'Sprache';
 
   @override
-  String get vpn_split_apps => 'Apps';
+  String get settingsAccount => 'Konto';
 
   @override
-  String get vpn_split_sites => 'Webseiten';
+  String get settingsNotifications => 'Benachrichtigungen';
 
   @override
-  String get vpn_traffic_in => 'Eingehend';
+  String get settingsLogout => 'Abmelden';
 
   @override
-  String get vpn_traffic_out => 'Ausgehend';
+  String get settingsVersion => 'Version';
 
   @override
-  String get vpn_access_title => 'Zugang erforderlich';
+  String get scheduleTitle => 'Stundenplan';
 
   @override
-  String get vpn_access_subtitle => 'VPN-Aktivierungscode eingeben';
+  String get scheduleComingSoon => 'Dein Stundenplan wird bald verfügbar sein.';
 
   @override
-  String get vpn_access_hint => 'Aktivierungscode';
+  String get pendingTitle => 'Konto wird geprüft';
 
   @override
-  String get vpn_access_button => 'Aktivieren';
+  String get pendingMessage =>
+      'Deine Anfrage wird vom Schuladministrator geprüft.';
 
   @override
-  String get settings_title => 'Einstellungen';
+  String get pendingAvailable => 'Du kannst bereits mit Freunden chatten!';
 
   @override
-  String get settings_theme => 'Design';
+  String get comingSoon => 'Demnächst verfügbar';
 
   @override
-  String get settings_theme_light => 'Hell';
+  String get comingSoonAi => 'KI-Assistent wird entwickelt';
 
   @override
-  String get settings_theme_dark => 'Dunkel';
+  String get comingSoonChats => 'Chats kommen bald';
 
   @override
-  String get settings_language => 'Sprache';
+  String get errorNetwork => 'Netzwerkfehler';
 
   @override
-  String get settings_account => 'Konto';
+  String get errorUnknown => 'Unbekannter Fehler';
 
   @override
-  String get settings_premium => 'Abonnement';
+  String get buttonOk => 'OK';
 
   @override
-  String get settings_activate_code => 'Aktivierungscode eingeben';
+  String get buttonCancel => 'Abbrechen';
 
   @override
-  String get settings_activate_button => 'Aktivieren';
+  String get buttonSave => 'Speichern';
 
   @override
-  String get coming_soon => 'Demnächst';
+  String get buttonClose => 'Schließen';
 
   @override
-  String get coming_soon_ai => 'KI-Assistent wird entwickelt';
+  String get sandboxLimitChats => 'Nach Schulverifizierung verfügbar';
 
   @override
-  String get coming_soon_chats => 'Chats kommen bald';
+  String get sandboxLimitSchedule => 'Nach Schulverifizierung verfügbar';
 
   @override
-  String get error_network => 'Netzwerkfehler';
+  String get sandboxLimitPasswordVault => 'Nach Elternverknüpfung verfügbar';
 
   @override
-  String get error_unknown => 'Unbekannter Fehler';
+  String get sandboxDailyLimitReached => 'Tageslimit erreicht. Bis morgen!';
 
   @override
-  String get button_ok => 'OK';
+  String get curfewTitle => 'Gute Nacht!';
 
   @override
-  String get button_cancel => 'Abbrechen';
+  String get curfewMessage => 'Die App ist bis morgen früh gesperrt.';
 
   @override
-  String get button_save => 'Speichern';
-
-  @override
-  String get button_close => 'Schließen';
-
-  @override
-  String get dashboard_donations_text =>
-      'Unterstütze das Projekt — Spenden helfen, V-Talk kostenlos zu halten.';
-
-  @override
-  String get tab_chats => 'Chats';
-
-  @override
-  String get tab_ai => 'Assistent';
-
-  @override
-  String get tab_vpn => 'VPN';
-
-  @override
-  String get tab_dashboard => 'Einstellungen';
-
-  @override
-  String get settings_notifications => 'Benachrichtigungen';
-
-  @override
-  String get settings_logout => 'Abmelden';
-
-  @override
-  String get settings_version => 'Version';
+  String get loginPrimaryButton => 'Weiter';
 }

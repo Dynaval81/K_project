@@ -77,6 +77,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          // Logo center
           Center(
             child: AnimatedBuilder(
               animation: _entryController,
@@ -91,28 +92,51 @@ class _SplashScreenState extends State<SplashScreen>
                 scale: _breathScale,
                 child: Image.asset(
                   'assets/images/knoty_logo.png',
-                  width: 180,
+                  width: 200,
                   fit: BoxFit.contain,
                 ),
               ),
             ),
           ),
 
-          // Tagline bottom
+          // HAI3 badge + tagline
           Positioned(
             bottom: 48,
             left: 0,
             right: 0,
             child: FadeTransition(
               opacity: _fadeIn,
-              child: Text(
-                l10n.splashTagline,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  letterSpacing: 0.4,
-                  color: Color(0xFFAAAAAA),
-                ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: const Color(0xFFE6B800).withOpacity(0.5)),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'HAI\u00B3',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2,
+                        color: Color(0xFFE6B800),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.splashTagline,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      letterSpacing: 0.4,
+                      color: Color(0xFFAAAAAA),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

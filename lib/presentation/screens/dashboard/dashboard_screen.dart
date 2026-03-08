@@ -55,6 +55,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     final ctrl = context.read<TabVisibilityController>();
     ctrl.setShowAiTab(_showAiTab);
     ctrl.setShowChatsTab(_showChatsTab);
+    ctrl.setShowScheduleTab(_showScheduleTab);
+    ctrl.setShowScheduleTab(_showScheduleTab);
   }
 
   void _showProfileOverlay() {

@@ -1,26 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:knoty/core/constants.dart';
-import 'package:knoty/core/constants/app_constants.dart';
 import 'package:knoty/core/controllers/ai_controller.dart';
 import 'package:knoty/presentation/widgets/molecules/chat_input_field.dart';
 import 'package:knoty/presentation/widgets/molecules/message_bubble.dart';
+import 'package:knoty/presentation/widgets/knoty_app_bar.dart';
 
-/// V-Assistant distinct bubble color (light purple).
 const Color kAiBubbleColor = Color(0xFFF3E5F5);
 
-/// Subtle gradient background for AI chat.
 const LinearGradient kAiBackgroundGradient = LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
-  colors: [
-    Color(0xFFF8F5FA),
-    Color(0xFFFDFBFF),
-  ],
+  colors: [Color(0xFFF8F5FA), Color(0xFFFDFBFF)],
 );
 
-/// HAI3 Screen: AI Assistant chat with V-Assistant (Airy + distinct style).
 class AiAssistantScreen extends StatelessWidget {
   const AiAssistantScreen({super.key});
 
@@ -29,84 +21,44 @@ class AiAssistantScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => AIController(),
       child: Scaffold(
+        appBar: const KnotyAppBar(title: 'KI-Assistent'),
         body: Container(
           decoration: const BoxDecoration(gradient: kAiBackgroundGradient),
-          child: SafeArea(
-            child: Consumer<AIController>(
+          child: Consumer<AIController>(
             builder: (context, ai, _) => Column(
               children: [
-                _buildAppBar(context),
-                Expanded(child: _buildMessageList(context)),
+                Expanded(child: _buildMessageList(context, ai)),
                 ChatInputField(onSendMessage: ai.sendUserMessage),
               ],
             ),
           ),
-          ),
         ),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.white.withValues(alpha: 0.85),
-      elevation: 0,
-      title: Row(
-        children: [
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: kAiBubbleColor,
-            child: Icon(Icons.auto_awesome, color: AppColors.primary, size: 20),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            'V-Assistant',
-            style: TextStyle(
-              color: AppColors.onSurface,
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.delete_outline, color: AppColors.onSurfaceVariant),
-          onPressed: () => context.read<AIController>().clearChat(),
-        ),
-        IconButton(
-          icon: Icon(Icons.person_outline_rounded, color: AppColors.onSurface),
-          onPressed: () => context.push(AppRoutes.settings),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMessageList(BuildContext context) {
-    return Consumer<AIController>(
-      builder: (context, ai, _) {
-        if (ai.messages.isEmpty && !ai.isThinking) {
-          return _buildEmptyState(context);
+  Widget _buildMessageList(BuildContext context, AIController ai) {
+    if (ai.messages.isEmpty && !ai.isThinking) {
+      return _buildEmptyState(context);
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      reverse: true,
+      itemCount: ai.messages.length + (ai.isThinking ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (ai.isThinking && index == 0) {
+          return _buildThinkingBubble();
         }
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-          reverse: true,
-          itemCount: ai.messages.length + (ai.isThinking ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (ai.isThinking && index == 0) {
-              return _buildThinkingBubble(context);
-            }
-            final msgIndex = ai.isThinking ? index - 1 : index;
-            final message = ai.messages[ai.messages.length - 1 - msgIndex];
-            final isPreviousFromSame = msgIndex < ai.messages.length - 1 &&
-                ai.messages[ai.messages.length - 2 - msgIndex].isMe == message.isMe;
-            return MessageBubble(
-              message: message,
-              isMe: message.isMe,
-              isPreviousFromSameSender: isPreviousFromSame,
-              receiverBubbleColor: kAiBubbleColor,
-            );
-          },
+        final msgIndex = ai.isThinking ? index - 1 : index;
+        final message = ai.messages[ai.messages.length - 1 - msgIndex];
+        final isPreviousFromSame = msgIndex < ai.messages.length - 1 &&
+            ai.messages[ai.messages.length - 2 - msgIndex].isMe ==
+                message.isMe;
+        return MessageBubble(
+          message: message,
+          isMe: message.isMe,
+          isPreviousFromSameSender: isPreviousFromSame,
+          receiverBubbleColor: kAiBubbleColor,
         );
       },
     );
@@ -117,29 +69,37 @@ class AiAssistantScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.auto_awesome, size: 56, color: AppColors.onSurfaceVariant.withValues(alpha: 0.5)),
-          const SizedBox(height: 16),
-          Text(
-            'Chat with V-Assistant',
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE6B800).withOpacity(0.10),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const Icon(Icons.auto_awesome,
+                size: 40, color: Color(0xFFE6B800)),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Knoty KI-Assistent',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A1A1A),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Ask anything – I\'ll respond in a moment.',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 14,
-              color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
-            ),
+          const Text(
+            'Stell mir eine Frage — ich helfe dir gerne.',
+            style: TextStyle(fontSize: 14, color: Color(0xFF6B6B6B)),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildThinkingBubble(BuildContext context) {
+  Widget _buildThinkingBubble() {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
       child: Align(
@@ -153,21 +113,18 @@ class AiAssistantScreen extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE6B800)),
                 ),
               ),
               const SizedBox(width: 10),
-              Text(
-                'Thinking...',
-                style: TextStyle(
-                  color: AppColors.onSurfaceVariant,
-                  fontSize: 14,
-                ),
+              const Text(
+                'Denkt nach...',
+                style: TextStyle(color: Color(0xFF6B6B6B), fontSize: 14),
               ),
             ],
           ),

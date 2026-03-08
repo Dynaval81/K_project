@@ -3,12 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:knoty/core/controllers/chat_controller.dart';
 import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
-import 'package:knoty/presentation/widgets/airy_chat_header.dart';
 import 'package:knoty/presentation/widgets/chat_search_delegate.dart';
 import 'package:knoty/presentation/widgets/airy_chat_list_item.dart';
+import 'package:knoty/presentation/widgets/knoty_app_bar.dart';
 
-/// 📱 V-Talk Chats Screen - L4 UI Layer
-/// Airy design with glassmorphism header and structured chat list
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({super.key});
 
@@ -38,68 +36,65 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final controller = context.watch<ChatController>();
     final chatRooms = controller.chatRooms;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          AiryChatHeader(
-            title: 'Chats',
-            onSearchPressed: () => showSearch(
+      appBar: KnotyAppBar(
+        title: 'Chats',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search_rounded,
+                color: Color(0xFF1A1A1A), size: 22),
+            onPressed: () => showSearch(
               context: context,
               delegate: ChatSearchDelegate(chats: chatRooms),
             ),
-            showProfileIcon: true,
           ),
-          chatRooms.isEmpty
-              ? const SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      "No messages yet",
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                  ),
-                )
-              : SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => AiryChatListItem(
-                        chatRoom: chatRooms[index],
-                        onTap: () {
-                          final chatId = chatRooms[index].id;
-                          controller.markAsRead(chatId);
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => ChatRoomScreen(
-                                chat: chatRooms[index],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      childCount: chatRooms.length,
-                    ),
-                  ),
-                ),
         ],
       ),
+      body: chatRooms.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.chat_bubble_outline_rounded,
+                      size: 56, color: Color(0xFFE0E0E0)),
+                  SizedBox(height: 16),
+                  Text(
+                    'Noch keine Nachrichten',
+                    style: TextStyle(
+                        fontSize: 16, color: Color(0xFF9E9E9E)),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
+              itemCount: chatRooms.length,
+              itemBuilder: (context, index) => AiryChatListItem(
+                chatRoom: chatRooms[index],
+                onTap: () {
+                  final chatId = chatRooms[index].id;
+                  controller.markAsRead(chatId);
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) =>
+                          ChatRoomScreen(chat: chatRooms[index]),
+                    ),
+                  );
+                },
+              ),
+            ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _createNewChat,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        child: const Icon(Icons.message, size: 24),
+        onPressed: () {}, // TODO: новый чат
+        backgroundColor: const Color(0xFFE6B800),
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.message_rounded, size: 24),
       ),
     );
-  }
-
-  void _createNewChat() {
-    // TODO: Implement new chat creation
   }
 }

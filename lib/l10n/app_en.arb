@@ -22,8 +22,8 @@
   "loginErrorNetwork": "Network error. Please try again.",
   "loginErrorEmailVerification": "Please verify your email before signing in",
   "loginErrorGeneric": "Sign in error. Please try again.",
-  "registerTitle": "Register",
-  "registerSubtitle": "Create account",
+  "registerTitle": "Sign Up",
+  "registerSubtitle": "Create a new account",
   "registerEmailLabel": "Email",
   "registerEmailHint": "Enter email",
   "registerPasswordLabel": "Password",
@@ -73,5 +73,6 @@
   "sandboxDailyLimitReached": "Daily limit reached. See you tomorrow!",
   "curfewTitle": "Good night!",
   "curfewMessage": "The app is locked until tomorrow morning.",
-  "loginPrimaryButton": "Continue"
+  "loginPrimaryButton": "Continue",
+  "splashHai3Label": "Gebaut nach HAI³-Philosophie"
 }

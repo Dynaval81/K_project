@@ -235,13 +235,13 @@ abstract class AppLocalizations {
   /// No description provided for @registerTitle.
   ///
   /// In de, this message translates to:
-  /// **'Registrieren'**
+  /// **'Registrierung'**
   String get registerTitle;
 
   /// No description provided for @registerSubtitle.
   ///
   /// In de, this message translates to:
-  /// **'Konto erstellen'**
+  /// **'Neues Konto anlegen'**
   String get registerSubtitle;
 
   /// No description provided for @registerEmailLabel.
@@ -283,7 +283,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerButton.
   ///
   /// In de, this message translates to:
-  /// **'Konto erstellen'**
+  /// **'Jetzt registrieren'**
   String get registerButton;
 
   /// No description provided for @registerHaveAccount.
@@ -543,6 +543,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Weiter'**
   String get loginPrimaryButton;
+
+  /// No description provided for @splashHai3Label.
+  ///
+  /// In de, this message translates to:
+  /// **'Gebaut nach HAI³-Philosophie'**
+  String get splashHai3Label;
 }
 
 class _AppLocalizationsDelegate

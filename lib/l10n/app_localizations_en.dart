@@ -76,10 +76,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginErrorGeneric => 'Sign in error. Please try again.';
 
   @override
-  String get registerTitle => 'Register';
+  String get registerTitle => 'Sign Up';
 
   @override
-  String get registerSubtitle => 'Create account';
+  String get registerSubtitle => 'Create a new account';
 
   @override
   String get registerEmailLabel => 'Email';
@@ -233,4 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginPrimaryButton => 'Continue';
+
+  @override
+  String get splashHai3Label => 'Gebaut nach HAI³-Philosophie';
 }

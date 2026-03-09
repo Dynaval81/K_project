@@ -90,16 +90,30 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               child: ScaleTransition(
                 scale: _breathScale,
-                child: Image.asset(
-                  'assets/images/knoty_logo.png',
-                  width: 200,
-                  fit: BoxFit.contain,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/knoty_logo.png',
+                      width: 200,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.splashTagline,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        letterSpacing: 0.3,
+                        color: Color(0xFF6B6B6B),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
 
-          // HAI3 badge + tagline
+          // HAI3 badge + label at bottom
           Positioned(
             bottom: 48,
             left: 0,
@@ -108,27 +122,14 @@ class _SplashScreenState extends State<SplashScreen>
               opacity: _fadeIn,
               child: Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: const Color(0xFFE6B800).withOpacity(0.5)),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'HAI\u00B3',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2,
-                        color: Color(0xFFE6B800),
-                      ),
-                    ),
+                  Image.asset(
+                    'assets/images/hai_3_dark.png',
+                    height: 28,
+                    fit: BoxFit.contain,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
-                    l10n.splashTagline,
+                    l10n.splashHai3Label,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 11,

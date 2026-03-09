@@ -180,6 +180,7 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         child: Scaffold(
         backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
           bottom: false,
           child: FadeTransition(
@@ -195,20 +196,9 @@ class _LoginScreenState extends State<LoginScreen>
 
                         // ── Logo ──────────────────────────────────
                         Image.asset(
-                          'assets/images/logo_bnb.png',
-                          width: 100,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "VTALK",
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w200,
-                            letterSpacing: 10,
-                            color: AppColors.primary,
-                            height: 1.0,
-                          ),
+                          'assets/images/knoty_logo.png',
+                          width: 180,
+                          fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 40),
 
@@ -232,68 +222,36 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
 
                         const SizedBox(height: 24),
-
-                        // ── Primary Button ────────────────────────
-                        _ZenButton(
-                          onPressed: _isLoading
-                              ? () {}
-                              : (_step == 0 ? _goToPassword : _onLogin),
-                          backgroundColor: AppColors.primary,
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 22, height: 22,
-                                  child: CircularProgressIndicator(
-                                      color: Colors.white, strokeWidth: 2),
-                                )
-                              : Text(
-                                  _step == 0
-                                      ? AppLocalizations.of(context)!.loginPrimaryButton
-                                      : AppLocalizations.of(context)!.loginButtonLogin,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                        ),
-
-                        const SizedBox(height: 24),
-                        _ZenDivider(label: AppLocalizations.of(context)!.loginDividerOr),
-                        const SizedBox(height: 24),
-
-                        _ZenButton(
-                          onPressed: () => _showError(AppLocalizations.of(context)!.loginGoogleSoon),
-                          backgroundColor: Colors.white,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.g_mobiledata_rounded,
-                                  color: AppColors.onSurface, size: 32),
-                              const SizedBox(width: 4),
-                              Text(AppLocalizations.of(context)!.loginGoogle,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _ZenButton(
-                          onPressed: () => _showError(AppLocalizations.of(context)!.loginAppleSoon),
-                          backgroundColor: AppColors.onSurface,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.apple,
-                                  color: Colors.white, size: 22),
-                              const SizedBox(width: 8),
-                              Text(AppLocalizations.of(context)!.loginApple,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 40),
                       ],
                     ),
+                  ),
+                ),
+
+                // ── Button always above keyboard ───────────────────
+                Padding(
+                  padding: EdgeInsets.fromLTRB(28, 0, 28,
+                      MediaQuery.of(context).viewInsets.bottom > 0
+                          ? MediaQuery.of(context).viewInsets.bottom + 16
+                          : 16),
+                  child: _ZenButton(
+                    onPressed: _isLoading
+                        ? () {}
+                        : (_step == 0 ? _goToPassword : _onLogin),
+                    backgroundColor: const Color(0xFFE6B800),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 22, height: 22,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
+                          )
+                        : Text(
+                            _step == 0
+                                ? AppLocalizations.of(context)!.loginPrimaryButton
+                                : AppLocalizations.of(context)!.loginButtonLogin,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ),
 
@@ -327,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   TextSpan(
                                     text: AppLocalizations.of(context)!.loginRegister,
                                     style: TextStyle(
-                                      color: AppColors.primary,
+                                      color: const Color(0xFFE6B800),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -357,20 +315,15 @@ class _LoginScreenState extends State<LoginScreen>
         AiryInputField(
           controller: _loginController,
           focusNode: _loginFocus,
-          label: 'Login',
-          hint: _getLoginHint(l10n),
-          keyboardType: _getKeyboardType(),
+          label: 'Anmelden',
+          hint: '',
+          keyboardType: TextInputType.emailAddress,
           onSubmitted: (_) => _goToPassword(),
         ),
-        const SizedBox(height: 16),
-        _MethodSelector(
-          selected: _loginMethodIndex,
-          labels: [
-            'Spitzname',
-            'Knoty-ID',
-            l10n.loginMethodEmail,
-          ],
-          onSelect: _selectMethod,
+        const SizedBox(height: 8),
+        const Text(
+          'Spitzname, Knoty-ID oder E-Mail eingeben',
+          style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
         ),
       ],
     );
@@ -487,60 +440,6 @@ class _ZenButton extends StatelessWidget {
   }
 }
 
-class _MethodSelector extends StatelessWidget {
-  final int selected;
-  final List<String> labels;
-  final ValueChanged<int> onSelect;
-
-  const _MethodSelector({
-    required this.selected,
-    required this.labels,
-    required this.onSelect,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F3F5),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(4),
-      child: Row(
-        children: List.generate(labels.length, (i) {
-          final active = i == selected;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onSelect(i),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutCubic,
-                decoration: BoxDecoration(
-                  color: active ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: active ? [AppShadows.sm] : null,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  labels[i],
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight:
-                        active ? FontWeight.w600 : FontWeight.w400,
-                    color: active
-                        ? AppColors.primary
-                        : AppColors.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-}
 
 class _ZenDivider extends StatelessWidget {
   final String label;

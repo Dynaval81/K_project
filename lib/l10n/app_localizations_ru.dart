@@ -76,10 +76,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginErrorGeneric => 'Anmeldefehler. Bitte erneut versuchen.';
 
   @override
-  String get registerTitle => 'Registrieren';
+  String get registerTitle => 'Registrierung';
 
   @override
-  String get registerSubtitle => 'Konto erstellen';
+  String get registerSubtitle => 'Neues Konto anlegen';
 
   @override
   String get registerEmailLabel => 'E-Mail';
@@ -100,7 +100,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get registerNicknameHint => 'Spitznamen eingeben';
 
   @override
-  String get registerButton => 'Konto erstellen';
+  String get registerButton => 'Jetzt registrieren';
 
   @override
   String get registerHaveAccount => 'Bereits ein Konto? ';
@@ -232,4 +232,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get loginPrimaryButton => 'Weiter';
+
+  @override
+  String get splashHai3Label => 'Gebaut nach HAI³-Philosophie';
 }

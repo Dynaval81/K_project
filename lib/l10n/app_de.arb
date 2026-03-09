@@ -22,15 +22,15 @@
   "loginErrorNetwork": "Netzwerkfehler. Bitte erneut versuchen.",
   "loginErrorEmailVerification": "Bitte bestätige deine E-Mail vor dem Login",
   "loginErrorGeneric": "Anmeldefehler. Bitte erneut versuchen.",
-  "registerTitle": "Registrieren",
-  "registerSubtitle": "Konto erstellen",
+  "registerTitle": "Registrierung",
+  "registerSubtitle": "Neues Konto anlegen",
   "registerEmailLabel": "E-Mail",
   "registerEmailHint": "E-Mail eingeben",
   "registerPasswordLabel": "Passwort",
   "registerPasswordHint": "Mindestens 6 Zeichen",
   "registerNicknameLabel": "Spitzname (optional)",
   "registerNicknameHint": "Spitznamen eingeben",
-  "registerButton": "Konto erstellen",
+  "registerButton": "Jetzt registrieren",
   "registerHaveAccount": "Bereits ein Konto? ",
   "registerLogin": "Anmelden",
   "dashboardTitle": "Dashboard",
@@ -73,5 +73,6 @@
   "sandboxDailyLimitReached": "Tageslimit erreicht. Bis morgen!",
   "curfewTitle": "Gute Nacht!",
   "curfewMessage": "Die App ist bis morgen früh gesperrt.",
-  "loginPrimaryButton": "Weiter"
+  "loginPrimaryButton": "Weiter",
+  "splashHai3Label": "Gebaut nach HAI³-Philosophie"
 }

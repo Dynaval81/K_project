@@ -21,8 +21,7 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_rounded,
-              color: Colors.black87, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.black87, size: 20),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -38,47 +37,51 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // Theme
-          _SectionCard(children: [
-            _SettingsRow(
-              icon: Icons.palette_outlined,
-              title: l10n.settingsTheme,
-              trailing: _ThemeToggle(provider: themeProvider),
-            ),
-          ]),
-          const SizedBox(height: 12),
-
-          // Language
-          _SectionCard(children: [
-            _SettingsRow(
-              icon: Icons.language_outlined,
-              title: l10n.settingsLanguage,
-              trailing: Text(
-                'Deutsch',
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+          // ── Тема ─────────────────────────────────────────────────
+          _SectionCard(
+            children: [
+              _SettingsRow(
+                icon: Icons.palette_outlined,
+                title: l10n.settingsTheme,
+                trailing: _ThemeToggle(provider: themeProvider),
               ),
-            ),
-          ]),
+            ],
+          ),
           const SizedBox(height: 12),
 
-          // Activation code
-          const _ActivationCard(),
-          const SizedBox(height: 12),
-
-          // App info
-          _SectionCard(children: [
-            _SettingsRow(
-              icon: Icons.info_outline_rounded,
-              title: l10n.dashboardAppInfo,
-              trailing: Text(
-                '1.0.0',
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+          // ── Аккаунт ──────────────────────────────────────────────
+          _SectionCard(
+            children: [
+              _SettingsRow(
+                icon: Icons.workspace_premium_outlined,
+                title: l10n.settingsAccount,
+                trailing: const Icon(Icons.arrow_forward_ios_rounded,
+                    size: 14, color: Colors.black26),
+                onTap: () {},
               ),
-            ),
-          ]),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // ── О приложении ─────────────────────────────────────────
+          _SectionCard(
+            children: [
+              _SettingsRow(
+                icon: Icons.info_outline_rounded,
+                title: l10n.dashboardAppInfo,
+                trailing: Text(
+                  '1.0.0',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 24),
 
-          // Logout
+          // ── Выйти ────────────────────────────────────────────────
           SizedBox(
             width: double.infinity,
             height: 52,
@@ -88,7 +91,7 @@ class SettingsScreen extends StatelessWidget {
                 if (context.mounted) context.go(AppRoutes.auth);
               },
               icon: const Icon(Icons.logout_rounded, size: 18),
-              label: Text(l10n.settingsLogout),
+              label: Text(l10n.dashboardLogout),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 foregroundColor: Colors.white,
@@ -154,10 +157,10 @@ class _SettingsRow extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFFE6B800).withOpacity(0.10),
+                color: AppColors.primaryBlue.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: const Color(0xFFE6B800), size: 18),
+              child: Icon(icon, color: AppColors.primaryBlue, size: 18),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -202,12 +205,18 @@ class _ThemeToggleState extends State<_ThemeToggle> {
           _Btn(
             icon: Icons.light_mode_rounded,
             active: !isDark,
-            onTap: () { widget.provider.setTheme(false); setState(() {}); },
+            onTap: () {
+              widget.provider.setTheme(false);
+              setState(() {});
+            },
           ),
           _Btn(
             icon: Icons.dark_mode_rounded,
             active: isDark,
-            onTap: () { widget.provider.setTheme(true); setState(() {}); },
+            onTap: () {
+              widget.provider.setTheme(true);
+              setState(() {});
+            },
           ),
         ],
       ),
@@ -238,158 +247,7 @@ class _Btn extends StatelessWidget {
         ),
         child: Icon(icon,
             size: 16,
-            color: active
-                ? const Color(0xFFE6B800)
-                : Colors.grey.shade500),
-      ),
-    );
-  }
-}
-
-class _ActivationCard extends StatefulWidget {
-  const _ActivationCard();
-
-  @override
-  State<_ActivationCard> createState() => _ActivationCardState();
-}
-
-class _ActivationCardState extends State<_ActivationCard> {
-  final _ctrl = TextEditingController();
-  bool _loading = false;
-  String? _error;
-  bool _success = false;
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _activate() async {
-    final code = _ctrl.text.trim();
-    final l10n = AppLocalizations.of(context)!;
-    if (code.isEmpty) return;
-
-    setState(() { _loading = true; _error = null; _success = false; });
-
-    try {
-      // TODO: connect to real API
-      await Future.delayed(const Duration(seconds: 1));
-      setState(() { _success = true; _loading = false; });
-      _ctrl.clear();
-      await Future.delayed(const Duration(seconds: 3));
-      if (mounted) setState(() => _success = false);
-    } catch (e) {
-      if (mounted) {
-        setState(() { _error = l10n.errorNetwork; _loading = false; });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2)),
-        ],
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE6B800).withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.vpn_key_outlined,
-                    color: Color(0xFFE6B800), size: 18),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Aktivierungscode',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (_success)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(12)),
-              child: const Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.green, size: 18),
-                  SizedBox(width: 8),
-                  Text('Code aktiviert!',
-                      style: TextStyle(color: Colors.green, fontSize: 14)),
-                ],
-              ),
-            )
-          else ...[
-            Container(
-              decoration: BoxDecoration(
-                  color: const Color(0xFFF1F3F5),
-                  borderRadius: BorderRadius.circular(12)),
-              child: TextField(
-                controller: _ctrl,
-                style: const TextStyle(fontSize: 15),
-                decoration: const InputDecoration(
-                  hintText: 'KNOTY-XXXX-XXXX',
-                  hintStyle: TextStyle(color: Colors.black38),
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                ),
-                onSubmitted: (_) => _activate(),
-              ),
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 8),
-              Text(_error!,
-                  style: const TextStyle(
-                      color: Colors.redAccent, fontSize: 13)),
-            ],
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _loading ? null : _activate,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE6B800),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                child: _loading
-                    ? const SizedBox(
-                        width: 18, height: 18,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
-                    : const Text('Aktivieren',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 15)),
-              ),
-            ),
-          ],
-        ],
+            color: active ? AppColors.primaryBlue : Colors.grey.shade500),
       ),
     );
   }

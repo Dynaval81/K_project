@@ -6,12 +6,12 @@ import 'package:knoty/core/constants/app_constants.dart';
 
 class RegistrationSuccessScreen extends StatefulWidget {
   final String nickname;
-  final String vtalkNumber;
+  final String knotyNumber;
 
   const RegistrationSuccessScreen({
     super.key,
     required this.nickname,
-    required this.vtalkNumber,
+    required this.knotyNumber,
   });
 
   @override
@@ -46,7 +46,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen>
   }
 
   Future<void> _copyNumber() async {
-    await Clipboard.setData(ClipboardData(text: widget.vtalkNumber));
+    await Clipboard.setData(ClipboardData(text: widget.knotyNumber));
     setState(() => _copied = true);
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
@@ -109,7 +109,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen>
                   ),
                   const SizedBox(height: 40),
 
-                  // ── VTalk number card ─────────────────────────────
+                  // ── Knoty ID card ─────────────────────────────
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -120,7 +120,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen>
                     child: Column(
                       children: [
                         Text(
-                          'Ваш VTalk номер',
+                          'Ваш Deine Knoty-ID',
                           style: TextStyle(
                             fontSize: 13,
                             color: AppColors.onSurfaceVariant,
@@ -149,7 +149,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'VT-',
+                                  'KN-',
                                   style: TextStyle(
                                     fontSize: 22,
                                     color: AppColors.onSurfaceVariant
@@ -158,7 +158,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen>
                                   ),
                                 ),
                                 Text(
-                                  widget.vtalkNumber.replaceFirst('VT-', '').replaceFirst('vt-', ''),
+                                  widget.knotyNumber.replaceFirst('KN-', '').replaceFirst('kn-', ''),
                                     style: TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.w700,

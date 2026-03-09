@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:knoty/core/controllers/auth_controller.dart';
@@ -17,6 +18,7 @@ class KnotyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final bool showAvatar;
   final Widget? leading;
+  final PreferredSizeWidget? bottom;
 
   const KnotyAppBar({
     super.key,
@@ -24,10 +26,11 @@ class KnotyAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.showAvatar = true,
     this.leading,
+    this.bottom,
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(60);
+  Size get preferredSize => Size.fromHeight(60 + (bottom?.preferredSize.height ?? 0));
 
   void _showProfileOverlay(BuildContext context) {
     final user = context.read<AuthController>().currentUser ??
@@ -62,8 +65,8 @@ class KnotyAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.w700,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
           color: Color(0xFF1A1A1A),
         ),
       ),
@@ -74,23 +77,11 @@ class KnotyAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.only(right: 16),
             child: GestureDetector(
               onTap: () => _showProfileOverlay(context),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE6B800).withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.person_outline_rounded,
-                  color: Color(0xFFE6B800),
-                  size: 20,
-                ),
-              ),
+              child: _AppBarAvatar(),
             ),
           ),
       ],
-      bottom: PreferredSize(
+      bottom: bottom ?? PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(
           height: 1,
@@ -148,14 +139,9 @@ class _ProfileOverlay extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
                     child: Row(
                       children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE6B800).withOpacity(0.12),
-                            shape: BoxShape.circle,
-                          ),
-                          child: _GradientAvatar(user?.username ?? '?'),
+                        _UserAvatarWidget(
+                          user: user,
+                          size: 56,
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -180,12 +166,12 @@ class _ProfileOverlay extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ],
-                              if (user?.vtNumber.isNotEmpty == true) ...[
+                              if (user?.knotyNumber.isNotEmpty == true) ...[
                                 const SizedBox(height: 2),
                                 Text(
-                                  user!.vtNumber.startsWith('KN-')
-                                      ? user!.vtNumber
-                                      : 'KN-${user!.vtNumber}',
+                                  user!.knotyNumber.startsWith('KN-')
+                                      ? user!.knotyNumber
+                                      : 'KN-${user!.knotyNumber}',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Color(0xFFE6B800),
@@ -198,6 +184,21 @@ class _ProfileOverlay extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+
+                  const Divider(height: 1),
+
+                  // Change photo
+                  ListTile(
+                    dense: true,
+                    leading: Icon(Icons.camera_alt_outlined,
+                        size: 18, color: Colors.grey.shade600),
+                    title: const Text('Profilbild ändern',
+                        style: TextStyle(fontSize: 14)),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      // TODO: image picker
+                    },
                   ),
 
                   const Divider(height: 1),
@@ -240,47 +241,153 @@ class _ProfileOverlay extends StatelessWidget {
   }
 }
 
-// ── Gradient Avatar ───────────────────────────────────────────────────────────
+
+// ── AppBar Avatar Button ──────────────────────────────────────────────────────
+String _fullName(User? user) {
+  if (user == null) return '?';
+  final first = user.firstName?.trim() ?? '';
+  final last = user.lastName?.trim() ?? '';
+  if (first.isNotEmpty && last.isNotEmpty) return '$first $last';
+  return user.username.isNotEmpty ? user.username : '?';
+}
+
+class _AppBarAvatar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    User? user;
+    try {
+      user = context.watch<AuthController>().currentUser;
+    } catch (_) {}
+
+    final avatarUrl = user?.avatar;
+
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: const BoxDecoration(shape: BoxShape.circle),
+      child: ClipOval(
+        child: avatarUrl != null && avatarUrl.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: avatarUrl,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => _GradientAvatar(_fullName(user)),
+                errorWidget: (_, __, ___) => _GradientAvatar(_fullName(user)),
+              )
+            : _GradientAvatar(_fullName(user)),
+      ),
+    );
+  }
+}
+
+// ── User Avatar Widget ────────────────────────────────────────────────────────
+class _UserAvatarWidget extends StatelessWidget {
+  final User? user;
+  final double size;
+
+  const _UserAvatarWidget({this.user, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final avatarUrl = user?.avatar;
+    return Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(shape: BoxShape.circle),
+      child: ClipOval(
+        child: avatarUrl != null && avatarUrl.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: avatarUrl,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => _GradientAvatar(_fullName(user)),
+                errorWidget: (_, __, ___) => _GradientAvatar(_fullName(user)),
+              )
+            : _GradientAvatar(_fullName(user)),
+      ),
+    );
+  }
+}
+
+// ── German Flag Avatar ───────────────────────────────────────────────────────
 class _GradientAvatar extends StatelessWidget {
   final String name;
   const _GradientAvatar(this.name);
 
-  static const _palettes = [
-    [Color(0xFFE6B800), Color(0xFFCC9900)],
-    [Color(0xFF9C27B0), Color(0xFF4A148C)],
-    [Color(0xFF00BCD4), Color(0xFF006064)],
-    [Color(0xFF4CAF50), Color(0xFF1B5E20)],
-    [Color(0xFFFF9800), Color(0xFFE65100)],
-    [Color(0xFFE91E63), Color(0xFF880E4F)],
-  ];
-
-  List<Color> get _colors {
-    if (name.isEmpty) return _palettes[0];
-    return _palettes[name.codeUnitAt(0) % _palettes.length];
+  List<String> _initials(String n) {
+    final parts = n.trim().split(' ');
+    if (parts.length >= 2) {
+      return [parts[0][0].toUpperCase(), parts[1][0].toUpperCase()];
+    }
+    if (n.isNotEmpty) return [n[0].toUpperCase(), ''];
+    return ['?', ''];
   }
 
   @override
   Widget build(BuildContext context) {
-    final letter = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: _colors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    final parts = _initials(name);
+    return CustomPaint(
+      painter: const _GermanFlagRingPainter(),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
         ),
-      ),
-      child: Center(
-        child: Text(
-          letter,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
+        margin: const EdgeInsets.all(3),
+        child: Center(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: parts[0],
+                  style: const TextStyle(
+                    color: Color(0xFF1A1A1A),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                if (parts[1].isNotEmpty)
+                  TextSpan(
+                    text: parts[1],
+                    style: const TextStyle(
+                      color: Color(0xFFE6B800),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+// ── German Flag Ring Painter ──────────────────────────────────────────────────
+class _GermanFlagRingPainter extends CustomPainter {
+  const _GermanFlagRingPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    const strokeWidth = 3.0;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    final rect = Rect.fromCircle(
+        center: center, radius: radius - strokeWidth / 2);
+
+    paint.color = const Color(0xFF1A1A1A); // Schwarz
+    canvas.drawArc(rect, -1.5708, 2.0944, false, paint);
+
+    paint.color = const Color(0xFFDD0000); // Rot
+    canvas.drawArc(rect, 0.5236, 2.0944, false, paint);
+
+    paint.color = const Color(0xFFE6B800); // Gold
+    canvas.drawArc(rect, 2.6180, 2.0944, false, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

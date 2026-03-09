@@ -44,3 +44,5 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animations/
+    - assets/emojis_v2/
+    - assets/emojis/

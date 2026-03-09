@@ -8,13 +8,13 @@ import 'package:knoty/services/api_service.dart';
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
   final String nickname;
-  final String vtalkNumber;
+  final String knotyNumber;
 
   const EmailVerificationScreen({
     super.key,
     required this.email,
     required this.nickname,
-    required this.vtalkNumber,
+    required this.knotyNumber,
   });
 
   @override
@@ -63,7 +63,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       if (result['success'] == true && verified) {
         context.go('/register-success', extra: {
           'nickname': widget.nickname,
-          'vtalkNumber': widget.vtalkNumber,
+          'knotyNumber': widget.knotyNumber,
         });
       } else {
         _showError('Email ещё не подтверждён. Проверьте папку «Спам».');

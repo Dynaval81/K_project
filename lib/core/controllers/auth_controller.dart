@@ -1,167 +1,151 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:knoty/services/api_service.dart';
 import 'package:knoty/data/models/user_model.dart';
 
-/// Результат попытки логина
-class AuthResult {
-  final bool success;
-  final String? error;
-  final bool isEmailNotVerified;
-
-  const AuthResult({
-    required this.success,
-    this.error,
-    this.isEmailNotVerified = false,
-  });
-
-  factory AuthResult.ok() => const AuthResult(success: true);
-
-  factory AuthResult.fail(String error, {bool isEmailNotVerified = false}) =>
-      AuthResult(success: false, error: error, isEmailNotVerified: isEmailNotVerified);
-}
-
-/// HAI3 Core: Auth controller — единственный источник правды об авторизации.
-///
-/// Жизненный цикл:
-/// 1. [tryRestoreSession] — вызывается при старте приложения.
-/// 2. [loginWithCredentials] — реальный логин через POST /auth/login.
-/// 3. [logout] — удаляем токен, сбрасываем состояние.
+/// HAI3 Core: Auth state — JWT + Matrix token.
 class AuthController extends ChangeNotifier {
-  // ── Dependencies ──────────────────────────────────────────────────
-  final ApiService _api;
-  final FlutterSecureStorage _storage;
+  AuthController({this.onUserLoaded});
 
-  final void Function(User user)? onUserLoaded;
-  final Future<void> Function()? onLogout;
+  final void Function(User?)? onUserLoaded;
+  final _storage = const FlutterSecureStorage();
+  final _api = ApiService();
 
-  AuthController({
-    ApiService? api,
-    FlutterSecureStorage? storage,
-    this.onUserLoaded,
-    this.onLogout,
-  })  : _api = api ?? ApiService(),
-        _storage = storage ?? const FlutterSecureStorage();
+  static const _jwtKey = 'auth_token';
+  static const _matrixTokenKey = 'matrix_token';
+  static const _matrixUserIdKey = 'matrix_user_id';
 
-  // ── State ─────────────────────────────────────────────────────────
   bool _isAuthenticated = false;
-  bool _isRestoringSession = true;
+  bool _isLoading = false;
   User? _currentUser;
+  String? _matrixToken;
+  String? _matrixUserId;
 
   bool get isAuthenticated => _isAuthenticated;
-  bool get isRestoringSession => _isRestoringSession;
+  bool get isLoading => _isLoading;
   User? get currentUser => _currentUser;
+  String? get matrixToken => _matrixToken;
+  String? get matrixUserId => _matrixUserId;
 
-  // ── Session restore ───────────────────────────────────────────────
+  // ── Restore session on app start ──────────────────────────────────────────
 
-  /// Вызвать один раз при старте приложения в main().
   Future<void> tryRestoreSession() async {
-    _isRestoringSession = true;
+    final jwt = await _storage.read(key: _jwtKey);
+    if (jwt == null || jwt.isEmpty) return; // нет сохранённой сессии
+    // Базовая валидация JWT формата (3 части через точку)
+    if (jwt.split('.').length != 3) {
+      await _clearSession();
+      return;
+    }
+
+    _matrixToken = await _storage.read(key: _matrixTokenKey);
+    _matrixUserId = await _storage.read(key: _matrixUserIdKey);
+
+    try {
+      final result = await _api.getUser();
+      if (result['success'] == true) {
+        final userData = result['user'];
+        if (userData != null) {
+          _currentUser = User.fromJson(userData);
+          _isAuthenticated = true;
+          notifyListeners();
+          onUserLoaded?.call(_currentUser);
+        } else {
+          await _clearSession();
+        }
+      } else {
+        await _clearSession();
+      }
+    } on SocketException {
+      // Нет сети — оставляем сессию, юзер залогинен по кэшу
+      _isAuthenticated = true;
+      notifyListeners();
+    } on TimeoutException {
+      // Таймаут — то же самое
+      _isAuthenticated = true;
+      notifyListeners();
+    } catch (_) {
+      // Неизвестная ошибка — безопаснее выйти
+      await _clearSession();
+    }
+  }
+
+  // ── Login ─────────────────────────────────────────────────────────────────
+
+  Future<Map<String, dynamic>> login(String identifier, String password) async {
+    _isLoading = true;
     notifyListeners();
 
     try {
-      final hasToken = await _api.hasToken();
-      if (!hasToken) {
-        _setUnauthenticated();
-        return;
+      final result = await _api.login(email: identifier, password: password);
+
+      if (result['success'] == true) {
+        // FIX #1: Сохраняем JWT токен
+        final jwt = result['token'] ??
+            result['data']?['token'] ??
+            result['accessToken'];
+        if (jwt != null) {
+          await _storage.write(key: _jwtKey, value: jwt.toString());
+        }
+
+        // Сохраняем Matrix токены
+        final matrixToken = result['matrixAccessToken'] ??
+            result['data']?['matrixAccessToken'];
+        final matrixUserId =
+            result['matrixUserId'] ?? result['data']?['matrixUserId'];
+
+        if (matrixToken != null) {
+          await _storage.write(
+              key: _matrixTokenKey, value: matrixToken.toString());
+          _matrixToken = matrixToken.toString();
+        }
+        if (matrixUserId != null) {
+          await _storage.write(
+              key: _matrixUserIdKey, value: matrixUserId.toString());
+          _matrixUserId = matrixUserId.toString();
+        }
+
+        final userData = result['user'] ?? result['data']?['user'];
+        if (userData != null) {
+          _currentUser = User.fromJson(userData);
+          onUserLoaded?.call(_currentUser);
+        }
+
+        _isAuthenticated = true;
+        notifyListeners();
       }
 
-      final result = await _api.getUser();
-      if (result['success'] == true && result['user'] != null) {
-        final user = User.fromJson(result['user'] as Map<String, dynamic>);
-        _setAuthenticated(user);
-      } else {
-        _setUnauthenticated();
-      }
-    } catch (_) {
-      _setUnauthenticated();
+      return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'error': 'Netzwerkfehler: ${e.toString()}',
+      };
     } finally {
-      _isRestoringSession = false;
+      _isLoading = false;
       notifyListeners();
     }
   }
 
-  // ── Login ─────────────────────────────────────────────────────────
-
-  /// Принимает email / VT-ID / никнейм — бэкенд различает сам.
-  Future<AuthResult> loginWithCredentials({
-    required String identifier,
-    required String password,
-  }) async {
-    try {
-      final response = await _api.login(email: identifier, password: password);
-
-      if (response['success'] == true) {
-        final userJson = response['user'];
-        if (userJson != null) {
-          final user = User.fromJson(userJson as Map<String, dynamic>);
-          _setAuthenticated(user);
-        }
-        return AuthResult.ok();
-      }
-
-      final isNotVerified = response['isEmailNotVerified'] == true;
-      final errorMsg = response['error']?.toString() ?? 'Ошибка входа';
-      return AuthResult.fail(errorMsg, isEmailNotVerified: isNotVerified);
-    } catch (e) {
-      return AuthResult.fail('Сетевая ошибка: ${e.toString()}');
-    }
-  }
-
-  // ── Logout ────────────────────────────────────────────────────────
+  // ── Logout ────────────────────────────────────────────────────────────────
 
   Future<void> logout() async {
-    try {
-      await onLogout?.call();
-    } catch (_) {}
-    await _api.logout();
-    _setUnauthenticated();
-  }
-
-  // ── Legacy shim ───────────────────────────────────────────────────
-
-  /// @deprecated Используй [loginWithCredentials].
-  void login() => _setAuthenticated(_currentUser ?? _placeholderUser());
-
-  // ── Private ───────────────────────────────────────────────────────
-
-  /// Обновляет текущего пользователя без запроса к серверу (после активации кода).
-  void updateUser(User user) {
-    _currentUser = user;
-    onUserLoaded?.call(user);
+    await _clearSession();
     notifyListeners();
   }
 
-  /// Перезапрашивает данные пользователя с сервера.
-  Future<void> refreshUser() async {
-    try {
-      final result = await _api.getUser();
-      if (result['success'] == true && result['user'] != null) {
-        final user = User.fromJson(result['user'] as Map<String, dynamic>);
-        _setAuthenticated(user);
-      }
-    } catch (e) {
-      debugPrint('[AUTH] refreshUser error: \$e');
-    }
-  }
-
-  void _setAuthenticated(User user) {
-    _isAuthenticated = true;
-    _currentUser = user;
-    onUserLoaded?.call(user);
-    notifyListeners();
-  }
-
-  void _setUnauthenticated() {
+  Future<void> _clearSession() async {
+    await Future.wait([
+      _storage.delete(key: _jwtKey),
+      _storage.delete(key: _matrixTokenKey),
+      _storage.delete(key: _matrixUserIdKey),
+    ]);
     _isAuthenticated = false;
     _currentUser = null;
-    notifyListeners();
+    _matrixToken = null;
+    _matrixUserId = null;
+    onUserLoaded?.call(null);
   }
-
-  User _placeholderUser() => User(
-        id: 'mock',
-        username: 'User',
-        email: '',
-        vtNumber: '',
-      );
 }

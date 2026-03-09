@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:knoty/core/controllers/tab_visibility_controller.dart';
 import 'package:knoty/presentation/screens/ai/ai_assistant_screen.dart';
 import 'package:knoty/presentation/screens/chats_screen.dart';
+import 'package:knoty/presentation/screens/school/school_screen.dart';
 import 'package:knoty/presentation/screens/dashboard/dashboard_screen.dart';
-import 'package:knoty/presentation/screens/schedule/schedule_screen.dart';
+import 'package:knoty/presentation/screens/school/school_screen.dart';
 
 class MainNavShell extends StatefulWidget {
   final int initialIndex;
@@ -18,11 +19,11 @@ class _MainNavShellState extends State<MainNavShell> {
   String _activeTabId = 'chats';
   int _currentIndex = 0;
 
-  static const List<String> _allTabIds = ['chats', 'ai', 'schedule', 'dashboard'];
+  static const List<String> _allTabIds = ['chats', 'ai', 'school', 'dashboard'];
   static const List<Widget> _allScreens = [
     ChatsScreen(key: PageStorageKey<String>('chats')),
     AiAssistantScreen(key: PageStorageKey<String>('ai')),
-    ScheduleScreen(key: PageStorageKey<String>('schedule')),
+    SchoolScreen(key: PageStorageKey<String>('school')),
     DashboardScreen(key: PageStorageKey<String>('dashboard')),
   ];
 
@@ -56,15 +57,15 @@ class _MainNavShellState extends State<MainNavShell> {
     final tabVisibility = context.watch<TabVisibilityController>();
     final showChats = tabVisibility.showChatsTab;
     final showAi = tabVisibility.showAiTab;
-    final showSchedule = tabVisibility.showScheduleTab;
+    final showSchool = tabVisibility.showScheduleTab; // reusing showSchedule flag for school
 
     final activeTabs = <_TabItem>[
       if (showChats)
         const _TabItem(icon: Icons.chat_bubble_outline_rounded, label: 'Chats', id: 'chats'),
       if (showAi)
         const _TabItem(icon: Icons.psychology_rounded, label: 'KI', id: 'ai'),
-      if (showSchedule)
-        const _TabItem(icon: Icons.calendar_today_rounded, label: 'Stundenplan', id: 'schedule'),
+      if (showSchool)
+        const _TabItem(icon: Icons.school_rounded, label: 'Schule', id: 'school'),
       const _TabItem(icon: Icons.dashboard_rounded, label: 'Dashboard', id: 'dashboard'),
     ];
 

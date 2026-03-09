@@ -3,8 +3,10 @@ import 'package:knoty/core/enums/verification_level.dart';
 class User {
   final String id;
   final String username;
+  final String? firstName;
+  final String? lastName;
   final String email;
-  final String vtNumber;
+  final String knotyNumber;
   final bool isPremium;
   final String? premiumPlan;
   final DateTime? premiumExpiresAt;
@@ -17,12 +19,16 @@ class User {
   final String? matrixUserId;
   final DateTime? createdAt;
   final VerificationLevel verificationLevel;
+  final String? school;
+  final String? schoolClass;
 
   User({
     required this.id,
     required this.username,
+    this.firstName,
+    this.lastName,
     required this.email,
-    required this.vtNumber,
+    required this.knotyNumber,
     this.isPremium = false,
     this.premiumPlan,
     this.premiumExpiresAt,
@@ -35,6 +41,8 @@ class User {
     this.matrixUserId,
     this.createdAt,
     this.verificationLevel = VerificationLevel.none,
+    this.school,
+    this.schoolClass,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -47,9 +55,9 @@ class User {
       try { return DateTime.parse(val.toString()); } catch (_) { return null; }
     }
 
-    // Нормализуем vtNumber — убираем VT- префикс если бэкенд его присылает
-    final rawVt = json['vtNumber']?.toString() ?? '';
-    final vtClean = rawVt.startsWith('VT-') ? rawVt.substring(3) : rawVt;
+    // Нормализуем knotyNumber — убираем VT- префикс если бэкенд его присылает
+    final rawVt = json['knotyNumber'] ?? json['vtNumber']?.toString() ?? '';
+    final vtClean = rawVt.startsWith('KN-') ? rawVt.substring(3) : rawVt.startsWith('VT-') ? rawVt.substring(3) : rawVt;
 
     // Parse verificationLevel
     VerificationLevel _parseVerificationLevel(dynamic val) {
@@ -69,8 +77,10 @@ class User {
     return User(
       id: json['id']?.toString() ?? '',
       username: username,
+      firstName: json['firstName']?.toString() ?? json['first_name']?.toString(),
+      lastName: json['lastName']?.toString() ?? json['last_name']?.toString(),
       email: json['email']?.toString() ?? '',
-      vtNumber: vtClean,
+      knotyNumber: vtClean,
       isPremium: json['isPremium'] == true,
       premiumPlan: json['premiumPlan']?.toString(),
       premiumExpiresAt: _parseDate(json['premiumExpiresAt']),
@@ -83,6 +93,8 @@ class User {
       matrixUserId: json['matrixUserId']?.toString(),
       createdAt: _parseDate(json['createdAt']),
       verificationLevel: _parseVerificationLevel(json['verificationLevel']),
+      school: json['school']?.toString(),
+      schoolClass: json['class']?.toString() ?? json['schoolClass']?.toString(),
     );
   }
 
@@ -104,6 +116,8 @@ class User {
 
   /// Returns true if user is in sandbox mode (restricted access)
   bool get isRestricted => verificationLevel == VerificationLevel.sandbox;
+  bool get isSchoolVerified => verificationLevel == VerificationLevel.verified;
+  bool get hasSchool => school != null && school!.isNotEmpty;
 
   String get premiumStatus {
     if (isPremium) return 'Premium активен';
@@ -126,8 +140,10 @@ class User {
   Map<String, dynamic> toJson() => {
     'id': id,
     'username': username,
+    'firstName': firstName,
+    'lastName': lastName,
     'email': email,
-    'vtNumber': vtNumber,
+    'knotyNumber': knotyNumber,
     'isPremium': isPremium,
     'premiumPlan': premiumPlan,
     'premiumExpiresAt': premiumExpiresAt?.toIso8601String(),
@@ -140,13 +156,17 @@ class User {
     'matrixUserId': matrixUserId,
     'createdAt': createdAt?.toIso8601String(),
     'verificationLevel': verificationLevel.name,
+    'school': school,
+    'schoolClass': schoolClass,
   };
 
   User copyWith({
     String? id,
     String? username,
+    String? firstName,
+    String? lastName,
     String? email,
-    String? vtNumber,
+    String? knotyNumber,
     bool? isPremium,
     String? premiumPlan,
     DateTime? premiumExpiresAt,
@@ -159,12 +179,16 @@ class User {
     String? matrixUserId,
     DateTime? createdAt,
     VerificationLevel? verificationLevel,
+    String? school,
+    String? schoolClass,
   }) {
     return User(
       id: id ?? this.id,
       username: username ?? this.username,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       email: email ?? this.email,
-      vtNumber: vtNumber ?? this.vtNumber,
+      knotyNumber: knotyNumber ?? this.knotyNumber,
       isPremium: isPremium ?? this.isPremium,
       premiumPlan: premiumPlan ?? this.premiumPlan,
       premiumExpiresAt: premiumExpiresAt ?? this.premiumExpiresAt,
@@ -177,6 +201,8 @@ class User {
       matrixUserId: matrixUserId ?? this.matrixUserId,
       createdAt: createdAt ?? this.createdAt,
       verificationLevel: verificationLevel ?? this.verificationLevel,
+      school: school ?? this.school,
+      schoolClass: schoolClass ?? this.schoolClass,
     );
   }
 }

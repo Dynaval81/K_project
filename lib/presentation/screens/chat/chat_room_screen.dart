@@ -6,11 +6,6 @@ import 'package:knoty/data/models/chat_room.dart';
 import 'package:knoty/presentation/widgets/molecules/chat_input_field.dart';
 import 'package:knoty/presentation/widgets/molecules/message_bubble.dart';
 
-const Color _kChatBackground = Color(0xFFF8F9FA);
-const Color _kChatAppBarBackground = Color(0xFFFFFFFF);
-const Color _kChatDividerLabel = Color(0xFF00A3FF);
-
-/// HAI3 Screen: Chat room – message thread + input.
 class ChatRoomScreen extends StatefulWidget {
   final ChatRoom chat;
 
@@ -24,16 +19,16 @@ class ChatRoomScreen extends StatefulWidget {
 }
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
-  late bool hasUnread;
+  late bool _hadUnread;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    hasUnread = widget.chat.unread > 0;
-    if (hasUnread) {
+    _hadUnread = widget.chat.unread > 0;
+    if (_hadUnread) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<ChatController>().markAsRead(widget.chat.id);
+        if (mounted) context.read<ChatController>().markAsRead(widget.chat.id);
       });
     }
   }
@@ -47,82 +42,155 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ChatController>();
-    final chatMessages = controller.messagesForChat(widget.chat.id);
+    final messages = controller.messagesForChat(widget.chat.id);
 
     return Scaffold(
-      backgroundColor: _kChatBackground,
-      appBar: _buildAppBar(context),
+      backgroundColor: const Color(0xFFF8F9FA),
+      appBar: _ChatAppBar(chat: widget.chat),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              reverse: true,
-              itemCount: chatMessages.length + (hasUnread ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (hasUnread && index == 0) {
-                  return _buildNewMessagesDivider();
-                }
-                final messageIndex = hasUnread ? index - 1 : index;
-                final message = chatMessages[messageIndex];
-                final isPreviousFromSameSender = messageIndex < chatMessages.length - 1 &&
-                    chatMessages[messageIndex + 1].isMe == message.isMe;
-                return MessageBubble(
-                  message: message,
-                  isMe: message.isMe,
-                  isPreviousFromSameSender: isPreviousFromSameSender,
-                );
-              },
-            ),
+            child: messages.isEmpty
+                ? _EmptyChat(isGroup: widget.chat.isGroup)
+                : ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    itemCount: messages.length + (_hadUnread ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (_hadUnread && index == 0) {
+                        return _NewMessagesDivider();
+                      }
+                      final msgIndex = _hadUnread ? index - 1 : index;
+                      final message = messages[msgIndex];
+                      final isPrevSame = msgIndex < messages.length - 1 &&
+                          messages[msgIndex + 1].isMe == message.isMe;
+                      return MessageBubble(
+                        message: message,
+                        isMe: message.isMe,
+                        isPreviousFromSameSender: isPrevSame,
+                      );
+                    },
+                  ),
           ),
           ChatInputField(
-            onSendMessage: (text) {
-              controller.sendMessage(widget.chat.id, text);
-            },
+            onSendMessage: (text) =>
+                controller.sendMessage(widget.chat.id, text),
           ),
         ],
       ),
     );
   }
+}
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final ChatRoom chat;
+
+  const _ChatAppBar({required this.chat});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  String _getInitials(String? name) {
+    if (name == null || name.isEmpty) return '?';
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    return name[0].toUpperCase();
+  }
+
+  Color _getAvatarColor(String id) {
+    const colors = [
+      Color(0xFF5C6BC0),
+      Color(0xFF26A69A),
+      Color(0xFFEF5350),
+      Color(0xFF42A5F5),
+      Color(0xFFAB47BC),
+      Color(0xFFEC407A),
+      Color(0xFF66BB6A),
+      Color(0xFFFF7043),
+    ];
+    return colors[id.hashCode.abs() % colors.length];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: _kChatAppBarBackground,
+      backgroundColor: Colors.white,
       elevation: 0,
       scrolledUnderElevation: 0.5,
+      shadowColor: Colors.black12,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: AppColors.onSurface),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded,
+            color: Color(0xFF1A1A1A), size: 20),
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: Row(
         children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: AppColors.surface,
-            backgroundImage: NetworkImage(
-              'https://i.pravatar.cc/150?u=${widget.chat.name}',
+          // Avatar
+          if (chat.isGroup)
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF8E1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFFE6B800).withOpacity(0.3),
+                ),
+              ),
+              child: Icon(
+                chat.isClassGroup
+                    ? Icons.school_rounded
+                    : Icons.group_rounded,
+                size: 20,
+                color: const Color(0xFFE6B800),
+              ),
+            )
+          else
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: _getAvatarColor(chat.id),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  _getInitials(chat.name),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.chat.name ?? 'Unknown',
+                  chat.name ?? 'Unbekannt',
                   style: const TextStyle(
-                    color: AppColors.onSurface,
+                    color: Color(0xFF1A1A1A),
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  'online',
+                  chat.isGroup
+                      ? (chat.isClassGroup ? 'Klassengruppe' : 'Schulgruppe')
+                      : (chat.isOnline ? 'Online' : 'Zuletzt gesehen'),
                   style: TextStyle(
-                    color: AppColors.onSurfaceVariant,
-                    fontSize: 13,
+                    color: chat.isOnline && chat.isPersonal
+                        ? const Color(0xFF4CAF50)
+                        : const Color(0xFF9E9E9E),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
@@ -130,26 +198,100 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           ),
         ],
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.more_vert_rounded,
+              color: Color(0xFF1A1A1A), size: 22),
+          onPressed: () {}, // TODO: chat options
+        ),
+      ],
     );
   }
+}
 
-  Widget _buildNewMessagesDivider() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Row(
+class _EmptyChat extends StatelessWidget {
+  final bool isGroup;
+
+  const _EmptyChat({required this.isGroup});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(child: Divider(color: AppColors.onSurfaceVariant.withValues(alpha: 0.3))),
-          const SizedBox(width: 8),
-          Text(
-            'NEW MESSAGES',
-            style: TextStyle(
-              color: _kChatDividerLabel,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF8E1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Icon(
+              isGroup
+                  ? Icons.group_rounded
+                  : Icons.chat_bubble_outline_rounded,
+              size: 36,
+              color: const Color(0xFFE6B800),
             ),
           ),
-          const SizedBox(width: 8),
-          Expanded(child: Divider(color: AppColors.onSurfaceVariant.withValues(alpha: 0.3))),
+          const SizedBox(height: 16),
+          const Text(
+            'Noch keine Nachrichten',
+            style: TextStyle(
+              fontSize: 15,
+              color: Color(0xFF9E9E9E),
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Schreibe die erste Nachricht!',
+            style: TextStyle(
+              fontSize: 13,
+              color: Color(0xFFBDBDBD),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NewMessagesDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Divider(
+                color: const Color(0xFFE6B800).withOpacity(0.4), height: 1),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF8E1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: const Color(0xFFE6B800).withOpacity(0.3)),
+            ),
+            child: const Text(
+              'Neue Nachrichten',
+              style: TextStyle(
+                color: Color(0xFFE6B800),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Divider(
+                color: const Color(0xFFE6B800).withOpacity(0.4), height: 1),
+          ),
         ],
       ),
     );

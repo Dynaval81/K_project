@@ -100,19 +100,19 @@ class _LoginScreenState extends State<LoginScreen>
 
     setState(() => _isLoading = true);
     try {
-      final result = await context.read<AuthController>().loginWithCredentials(
-        identifier: identifier,
-        password: password,
+      final result = await context.read<AuthController>().login(
+        identifier,
+        password,
       );
       if (!mounted) return;
 
-      if (result.success) {
+      if (result['success'] == true) {
         context.go(AppRoutes.home);
-      } else if (result.isEmailNotVerified) {
+      } else if (result['isEmailNotVerified'] == true) {
         _showError(AppLocalizations.of(context)!.loginErrorEmailVerification);
         _goBack();
       } else {
-        _showError(result.error ?? AppLocalizations.of(context)!.loginErrorGeneric);
+        _showError(result['error']?.toString() ?? AppLocalizations.of(context)!.loginErrorGeneric);
         _goBack();
       }
     } catch (e) {
@@ -440,6 +440,60 @@ class _ZenButton extends StatelessWidget {
   }
 }
 
+class _MethodSelector extends StatelessWidget {
+  final int selected;
+  final List<String> labels;
+  final ValueChanged<int> onSelect;
+
+  const _MethodSelector({
+    required this.selected,
+    required this.labels,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F3F5),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: List.generate(labels.length, (i) {
+          final active = i == selected;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onSelect(i),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: active ? Colors.white : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: active ? [AppShadows.sm] : null,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  labels[i],
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                        active ? FontWeight.w600 : FontWeight.w400,
+                    color: active
+                        ? const Color(0xFFE6B800)
+                        : AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
 
 class _ZenDivider extends StatelessWidget {
   final String label;

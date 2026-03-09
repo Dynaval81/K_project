@@ -28,11 +28,20 @@ void main() async {
   AppLogger.instance.init();
 
   final userProvider = UserProvider();
+  // FIX #4: chatController создаётся до authController
+  final chatController = ChatController();
+
   final authController = AuthController(
-    onUserLoaded: userProvider.setUser,
+    onUserLoaded: (user) {
+      if (user != null) userProvider.setUser(user);
+      // userId обновляется через chatController напрямую из login()
+      if (user != null) chatController.updateUserId(user.matrixUserId);
+    },
   );
 
   await authController.tryRestoreSession();
+  // Синхронизируем userId после восстановления сессии
+  chatController.updateUserId(authController.matrixUserId);
 
   final initialLocation = authController.isAuthenticated
       ? AppRoutes.home
@@ -47,7 +56,7 @@ void main() async {
         ChangeNotifierProvider.value(value: authController),
         ChangeNotifierProvider.value(value: userProvider),
         ChangeNotifierProvider.value(value: themeProvider),
-        ChangeNotifierProvider(create: (_) => ChatController()),
+        ChangeNotifierProvider.value(value: chatController),
         ChangeNotifierProvider(create: (_) => TabVisibilityController()..load()),
       ],
       child: KnotyApp(initialLocation: initialLocation),
@@ -92,7 +101,7 @@ class _KnotyAppState extends State<KnotyApp> {
             return EmailVerificationScreen(
               email: extra['email']?.toString() ?? '',
               nickname: extra['nickname']?.toString() ?? '',
-              vtalkNumber: extra['knotyNumber']?.toString() ?? '',
+              knotyNumber: extra['knotyNumber']?.toString() ?? '',
             );
           },
         ),
@@ -102,7 +111,7 @@ class _KnotyAppState extends State<KnotyApp> {
             final extra = state.extra as Map<String, dynamic>? ?? {};
             return RegistrationSuccessScreen(
               nickname: extra['nickname']?.toString() ?? '',
-              vtalkNumber: extra['knotyNumber']?.toString() ?? '',
+              knotyNumber: extra['knotyNumber']?.toString() ?? '',
             );
           },
         ),
@@ -187,7 +196,7 @@ class _ErrorScreen extends StatelessWidget {
             Text(
               error?.toString() ?? 'Unbekannter Fehler',
               style: AppTextStyles.body.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: const Color(0xFF757575),
               ),
               textAlign: TextAlign.center,
             ),

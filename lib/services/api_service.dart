@@ -17,7 +17,12 @@ class ApiService {
     required String email,
     required String password,
     String? username,
-    String region = 'RU',
+    String? firstName,
+    String? lastName,
+    String? role,          // 'student' | 'parent' | 'teacher'
+    String? schoolCode,    // SCH-XXXX
+    String? linkedChildKn, // для parent: KN-номер ребёнка
+    String region = 'DE',
   }) async {
     try {
       final response = await http.post(
@@ -26,7 +31,13 @@ class ApiService {
         body: jsonEncode({
           'email': email,
           'password': password,
-          'username': username,
+          if (username != null)       'username': username,
+          if (firstName != null)      'firstName': firstName,
+          if (lastName != null)       'lastName': lastName,
+          if (role != null)           'role': role,
+          if (schoolCode != null)     'schoolCode': schoolCode,
+          if (linkedChildKn != null)  'linkedChildKn': linkedChildKn,
+          'region': region,
         }),
       ).timeout(_timeout);
 
@@ -89,10 +100,17 @@ class ApiService {
         if (token != null) {
           await _secureStorage.write(key: _tokenKey, value: token);
         }
+        // Store Matrix access token separately
+        final matrixToken = data['matrixAccessToken'] ?? data['data']?['matrixAccessToken'];
+        if (matrixToken != null) {
+          await _secureStorage.write(key: 'matrix_access_token', value: matrixToken.toString());
+        }
         return {
           'success': true,
           'user': userData,
           'token': token,
+          'matrixUserId': data['matrixUserId'] ?? data['data']?['matrixUserId'],
+          'matrixAccessToken': matrixToken,
           'isFirstLogin': userData?['isFirstLogin'] ?? false,
         };
       } else if (response.statusCode == 403) {
@@ -118,32 +136,8 @@ class ApiService {
     }
   }
 
-  // Получение данных пользователя
-  Future<Map<String, dynamic>> getUser() async {
-    try {
-      final token = await _secureStorage.read(key: _tokenKey);
-      if (token == null) return {'success': false, 'error': 'No token found'};
-
-      final response = await http.get(
-        Uri.parse('$_baseUrl/auth/me'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        final userJson = data['data']?['user'] ?? data['user'];
-        return {'success': true, 'user': userJson};
-      } else {
-        await _secureStorage.delete(key: _tokenKey);
-        return {'success': false, 'error': 'Token expired'};
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Network error: ${e.toString()}'};
-    }
-  }
+  /// Алиас → [getUserData]. Используй [getUserData] напрямую для новых вызовов.
+  Future<Map<String, dynamic>> getUser() => getUserData();
 
   // Проверка наличия токена
   Future<bool> hasToken() async {

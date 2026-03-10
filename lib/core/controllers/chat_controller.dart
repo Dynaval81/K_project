@@ -48,8 +48,7 @@ class ChatController extends ChangeNotifier {
       for (final msg in newMessages) {
         final roomId = msg.chatId ?? '';
         // Атомарное обновление через putIfAbsent + работа только с актуальным списком
-        _messagesByRoom.putIfAbsent(roomId, () => []);
-        final list = _messagesByRoom[roomId]!;
+        final list = _messagesByRoom.putIfAbsent(roomId, () => []);
         if (!list.any((m) => m.id == msg.id)) {
           final corrected = _matrixUserId != null
               ? msg.copyWith(isMe: msg.senderId == _matrixUserId)

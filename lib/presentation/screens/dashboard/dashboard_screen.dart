@@ -187,27 +187,38 @@ class _DashboardScreenState extends State<DashboardScreen>
                 title: 'Store',
                 initiallyExpanded: true,
                 children: [
-                  SwitchListTile(
-                    value: _showChatsTab,
-                    onChanged: (v) { setState(() => _showChatsTab = v); _saveTabVisibility(); },
-                    title: Text('Chats',
-                        style: const TextStyle(fontSize: 16, color: Colors.black)),
-                    activeColor: const Color(0xFFE6B800),
-                  ),
-                  SwitchListTile(
-                    value: _showAiTab,
-                    onChanged: (v) { setState(() => _showAiTab = v); _saveTabVisibility(); },
-                    title: Text('KI',
-                        style: const TextStyle(fontSize: 16, color: Colors.black)),
-                    activeColor: const Color(0xFFE6B800),
-                  ),
-                  SwitchListTile(
-                    value: _showSchoolTab,
-                    onChanged: (v) { setState(() => _showSchoolTab = v); _saveTabVisibility(); },
-                    title: Text('Schule',
-                        style: const TextStyle(fontSize: 16, color: Colors.black)),
-                    activeColor: const Color(0xFFE6B800),
-                  ),
+                  Builder(builder: (context) {
+                    // Считаем сколько вкладок сейчас включено
+                    final enabledCount = [_showChatsTab, _showAiTab, _showSchoolTab]
+                        .where((v) => v).length;
+                    // Последнюю включённую вкладку нельзя выключить
+                    return Column(children: [
+                      SwitchListTile(
+                        value: _showChatsTab,
+                        onChanged: (_showChatsTab && enabledCount <= 1) ? null
+                            : (v) { setState(() => _showChatsTab = v); _saveTabVisibility(); },
+                        title: Text('Chats',
+                            style: const TextStyle(fontSize: 16, color: Colors.black)),
+                        activeColor: const Color(0xFFE6B800),
+                      ),
+                      SwitchListTile(
+                        value: _showAiTab,
+                        onChanged: (_showAiTab && enabledCount <= 1) ? null
+                            : (v) { setState(() => _showAiTab = v); _saveTabVisibility(); },
+                        title: Text('KI',
+                            style: const TextStyle(fontSize: 16, color: Colors.black)),
+                        activeColor: const Color(0xFFE6B800),
+                      ),
+                      SwitchListTile(
+                        value: _showSchoolTab,
+                        onChanged: (_showSchoolTab && enabledCount <= 1) ? null
+                            : (v) { setState(() => _showSchoolTab = v); _saveTabVisibility(); },
+                        title: Text('Schule',
+                            style: const TextStyle(fontSize: 16, color: Colors.black)),
+                        activeColor: const Color(0xFFE6B800),
+                      ),
+                    ]);
+                  }),
                 ],
               ),
 

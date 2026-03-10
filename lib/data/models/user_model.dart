@@ -1,4 +1,5 @@
 import 'package:knoty/core/enums/verification_level.dart';
+import 'package:knoty/core/enums/user_role.dart';
 
 class User {
   final String id;
@@ -21,6 +22,12 @@ class User {
   final VerificationLevel verificationLevel;
   final String? school;
   final String? schoolClass;
+  final UserRole role;
+  // linkedAccounts: KN-номера связанных аккаунтов (учитель↔родитель).
+  // UI переключения — post-MVP. Поле закладывается сейчас.
+  final List<String> linkedAccounts;
+  final String? linkedChildId; // для родителя: KN-номер ребёнка
+  final String? schoolId;      // ID школы (для фильтрации Matrix)
 
   User({
     required this.id,
@@ -43,6 +50,10 @@ class User {
     this.verificationLevel = VerificationLevel.none,
     this.school,
     this.schoolClass,
+    this.role = UserRole.student,
+    this.linkedAccounts = const [],
+    this.linkedChildId,
+    this.schoolId,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -95,6 +106,10 @@ class User {
       verificationLevel: _parseVerificationLevel(json['verificationLevel']),
       school: json['school']?.toString(),
       schoolClass: json['class']?.toString() ?? json['schoolClass']?.toString(),
+      role: UserRoleX.fromString(json['role']?.toString()),
+      linkedAccounts: (json['linkedAccounts'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      linkedChildId: json['linkedChildId']?.toString(),
+      schoolId: json['schoolId']?.toString(),
     );
   }
 
@@ -118,6 +133,14 @@ class User {
   bool get isRestricted => verificationLevel == VerificationLevel.sandbox;
   bool get isSchoolVerified => verificationLevel == VerificationLevel.verified;
   bool get hasSchool => school != null && school!.isNotEmpty;
+
+  /// Роль-based геттеры
+  bool get isStudent    => role == UserRole.student;
+  bool get isParent     => role == UserRole.parent;
+  bool get isTeacher    => role == UserRole.teacher;
+  bool get isSchoolAdmin => role == UserRole.schoolAdmin;
+  bool get isSuperAdmin => role == UserRole.superAdmin;
+  bool get isAdmin      => isSchoolAdmin || isSuperAdmin;
 
   String get premiumStatus {
     if (isPremium) return 'Premium активен';
@@ -158,6 +181,10 @@ class User {
     'verificationLevel': verificationLevel.name,
     'school': school,
     'schoolClass': schoolClass,
+    'role': role.name,
+    'linkedAccounts': linkedAccounts,
+    'linkedChildId': linkedChildId,
+    'schoolId': schoolId,
   };
 
   User copyWith({
@@ -181,6 +208,10 @@ class User {
     VerificationLevel? verificationLevel,
     String? school,
     String? schoolClass,
+    UserRole? role,
+    List<String>? linkedAccounts,
+    String? linkedChildId,
+    String? schoolId,
   }) {
     return User(
       id: id ?? this.id,
@@ -203,6 +234,10 @@ class User {
       verificationLevel: verificationLevel ?? this.verificationLevel,
       school: school ?? this.school,
       schoolClass: schoolClass ?? this.schoolClass,
+      role: role ?? this.role,
+      linkedAccounts: linkedAccounts ?? this.linkedAccounts,
+      linkedChildId: linkedChildId ?? this.linkedChildId,
+      schoolId: schoolId ?? this.schoolId,
     );
   }
 }

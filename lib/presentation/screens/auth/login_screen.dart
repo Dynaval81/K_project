@@ -100,19 +100,19 @@ class _LoginScreenState extends State<LoginScreen>
 
     setState(() => _isLoading = true);
     try {
-      final result = await context.read<AuthController>().login(
-        identifier,
-        password,
+      final result = await context.read<AuthController>().loginWithCredentials(
+        identifier: identifier,
+        password: password,
       );
       if (!mounted) return;
 
-      if (result['success'] == true) {
+      if (result.success) {
         context.go(AppRoutes.home);
-      } else if (result['isEmailNotVerified'] == true) {
+      } else if (result.isEmailNotVerified) {
         _showError(AppLocalizations.of(context)!.loginErrorEmailVerification);
         _goBack();
       } else {
-        _showError(result['error']?.toString() ?? AppLocalizations.of(context)!.loginErrorGeneric);
+        _showError(result.error ?? AppLocalizations.of(context)!.loginErrorGeneric);
         _goBack();
       }
     } catch (e) {
@@ -138,10 +138,10 @@ class _LoginScreenState extends State<LoginScreen>
 
   String _getLoginHint(AppLocalizations l10n) {
     switch (_loginMethodIndex) {
-      case 0: return 'Spitzname';
+      case 0: return '@Benutzername';
       case 1: return 'Knoty-ID';
       case 2: return l10n.loginHintEmail;
-      default: return 'Spitzname';
+      default: return '@Benutzername';
     }
   }
 
@@ -168,7 +168,13 @@ class _LoginScreenState extends State<LoginScreen>
           }
         }
       },
-      child: Theme(
+      child: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          if ((details.primaryVelocity ?? 0) > 300 && _step == 1) {
+            _goBack();
+          }
+        },
+        child: Theme(
         // Force light theme on login screen regardless of system theme
         data: ThemeData.light().copyWith(
           scaffoldBackgroundColor: Colors.white,
@@ -303,6 +309,7 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         ), // Scaffold
       ), // Theme
+      ), // GestureDetector
     );
   }
 
@@ -322,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         const SizedBox(height: 8),
         const Text(
-          'Spitzname, Knoty-ID oder E-Mail eingeben',
+          '@Benutzername, Knoty-ID oder E-Mail eingeben',
           style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
         ),
       ],

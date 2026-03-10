@@ -1,11 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:knoty/core/controllers/auth_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:knoty/core/controllers/auth_controller.dart';
 import 'package:knoty/core/controllers/chat_controller.dart';
 import 'package:knoty/data/models/chat_room.dart';
-import 'package:knoty/data/models/user_model.dart';
 import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
 import 'package:knoty/presentation/widgets/knoty_app_bar.dart';
 
@@ -44,23 +43,20 @@ class _ChatsScreenState extends State<ChatsScreen>
     context.read<ChatController>().markAsRead(chat.id);
     Navigator.push(
       context,
-      CupertinoPageRoute(builder: (context) => ChatRoomScreen(chat: chat)),
+      CupertinoPageRoute(
+        builder: (context) => ChatRoomScreen(chat: chat),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ChatController>();
-    final user = context.watch<AuthController>().currentUser;
     final allRooms = controller.chatRooms;
-
     final personal = allRooms.where((c) => c.isPersonal).toList();
-    final groups = allRooms.where((c) => c.type == ChatType.schoolGroup).toList();
-    final schoolRooms = allRooms
-        .where((c) => c.type == ChatType.classGroup || c.type == ChatType.schoolGroup)
-        .toList();
-
-    final isVerified = user?.isSchoolVerified ?? false;
+    final groups = allRooms.where((c) => c.isGroup).toList();
+    final school = allRooms.where((c) => c.isSchool).toList();
+    final isSchoolVerified = context.watch<AuthController>().currentUser?.isSchoolVerified ?? false;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -72,8 +68,14 @@ class _ChatsScreenState extends State<ChatsScreen>
           unselectedLabelColor: const Color(0xFF9E9E9E),
           indicatorColor: const Color(0xFFE6B800),
           indicatorWeight: 2,
-          labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-          unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          labelStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
           tabs: [
             const Tab(text: 'Persönlich'),
             const Tab(text: 'Gruppen'),
@@ -82,9 +84,10 @@ class _ChatsScreenState extends State<ChatsScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text('Schule'),
-                  if (!isVerified) ...[
+                  if (!isSchoolVerified) ...[
                     const SizedBox(width: 4),
-                    const Icon(Icons.lock_rounded, size: 12, color: Color(0xFF9E9E9E)),
+                    const Icon(Icons.lock_rounded, size: 12,
+                        color: Color(0xFF9E9E9E)),
                   ],
                 ],
               ),
@@ -94,29 +97,29 @@ class _ChatsScreenState extends State<ChatsScreen>
       ),
       body: TabBarView(
         controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           _ChatList(
             rooms: personal,
             onTap: (chat) => _openChat(context, chat),
             emptyText: 'Noch keine persönlichen Chats',
-            emptySubtext: 'Schreibe jemandem als Erstes!',
           ),
           _ChatList(
             rooms: groups,
             onTap: (chat) => _openChat(context, chat),
             emptyText: 'Noch keine Gruppen',
-            emptySubtext: '',
           ),
-          _SchoolTab(
-            rooms: schoolRooms,
-            user: user,
-            isVerified: isVerified,
-            onTap: (chat) => _openChat(context, chat),
-          ),
+          isSchoolVerified
+              ? _ChatList(
+                  rooms: school,
+                  onTap: (chat) => _openChat(context, chat),
+                  emptyText: 'Noch keine Schulchats',
+                )
+              : _SchoolChatLocked(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {}, // TODO: новый чат
         backgroundColor: const Color(0xFFE6B800),
         foregroundColor: Colors.white,
         elevation: 2,
@@ -126,223 +129,15 @@ class _ChatsScreenState extends State<ChatsScreen>
   }
 }
 
-// ── School Tab ────────────────────────────────────────────────────────────────
-
-class _SchoolTab extends StatelessWidget {
-  final List<ChatRoom> rooms;
-  final User? user;
-  final bool isVerified;
-  final void Function(ChatRoom) onTap;
-
-  const _SchoolTab({
-    required this.rooms,
-    required this.user,
-    required this.isVerified,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (!isVerified) return _LockedSchoolOverlay(user: user);
-
-    if (rooms.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF8E1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(Icons.school_rounded, size: 36, color: Color(0xFFE6B800)),
-            ),
-            const SizedBox(height: 16),
-            const Text('Keine Schulchats',
-                style: TextStyle(fontSize: 15, color: Color(0xFF9E9E9E))),
-            const SizedBox(height: 6),
-            Text(user?.school ?? '',
-                style: const TextStyle(fontSize: 13, color: Color(0xFFBDBDBD))),
-          ],
-        ),
-      );
-    }
-
-    final classRooms = rooms.where((r) => r.type == ChatType.classGroup).toList();
-    final schoolRooms = rooms.where((r) => r.type == ChatType.schoolGroup).toList();
-
-    return ListView(
-      physics: const BouncingScrollPhysics(),
-      children: [
-        if (classRooms.isNotEmpty) ...[
-          _SectionHeader(
-            icon: Icons.group_rounded,
-            title: 'Meine Klasse',
-            subtitle: user?.schoolClass ?? '',
-          ),
-          ...classRooms.map((r) => _ChatListItem(chat: r, onTap: () => onTap(r))),
-        ],
-        if (schoolRooms.isNotEmpty) ...[
-          _SectionHeader(
-            icon: Icons.school_rounded,
-            title: 'Schulchats',
-            subtitle: user?.school ?? '',
-          ),
-          ...schoolRooms.map((r) => _ChatListItem(chat: r, onTap: () => onTap(r))),
-        ],
-      ],
-    );
-  }
-}
-
-class _LockedSchoolOverlay extends StatelessWidget {
-  final User? user;
-  const _LockedSchoolOverlay({this.user});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(color: Colors.white.withOpacity(0.85)),
-          ),
-        ),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF8E1),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                        color: const Color(0xFFE6B800).withOpacity(0.3)),
-                  ),
-                  child: const Icon(Icons.school_rounded,
-                      size: 40, color: Color(0xFFE6B800)),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Schulchats gesperrt',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Deine Schule muss dich erst bestätigen, bevor du auf Klassen- und Schulchats zugreifen kannst.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF9E9E9E),
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF8E1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                        color: const Color(0xFFE6B800).withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.hourglass_top_rounded,
-                          size: 16, color: Color(0xFFE6B800)),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          'Warte auf Bestätigung von\n${user?.school ?? 'deiner Schule'}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFFE6B800),
-                            fontWeight: FontWeight.w500,
-                            height: 1.4,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _SectionHeader({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: const Color(0xFFE6B800)),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1A1A1A),
-            ),
-          ),
-          if (subtitle.isNotEmpty) ...[
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                subtitle,
-                style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-// ── Chat List ─────────────────────────────────────────────────────────────────
-
 class _ChatList extends StatelessWidget {
   final List<ChatRoom> rooms;
   final void Function(ChatRoom) onTap;
   final String emptyText;
-  final String emptySubtext;
 
   const _ChatList({
     required this.rooms,
     required this.onTap,
     required this.emptyText,
-    required this.emptySubtext,
   });
 
   @override
@@ -359,17 +154,21 @@ class _ChatList extends StatelessWidget {
                 color: const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(Icons.chat_bubble_outline_rounded,
-                  size: 36, color: Color(0xFFBDBDBD)),
+              child: const Icon(
+                Icons.chat_bubble_outline_rounded,
+                size: 36,
+                color: Color(0xFFBDBDBD),
+              ),
             ),
             const SizedBox(height: 16),
-            Text(emptyText,
-                style: const TextStyle(fontSize: 15, color: Color(0xFF9E9E9E))),
-            if (emptySubtext.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Text(emptySubtext,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFFBDBDBD))),
-            ],
+            Text(
+              emptyText,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Color(0xFF9E9E9E),
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ],
         ),
       );
@@ -385,8 +184,6 @@ class _ChatList extends StatelessWidget {
     );
   }
 }
-
-// ── Chat List Item ────────────────────────────────────────────────────────────
 
 class _ChatListItem extends StatelessWidget {
   final ChatRoom chat;
@@ -413,12 +210,14 @@ class _ChatListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasUnread = chat.unread > 0;
+
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
+            // Avatar
             Stack(
               children: [
                 _Avatar(chat: chat),
@@ -439,6 +238,7 @@ class _ChatListItem extends StatelessWidget {
               ],
             ),
             const SizedBox(width: 12),
+            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,7 +250,9 @@ class _ChatListItem extends StatelessWidget {
                           chat.name ?? 'Unbekannt',
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight: hasUnread
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                             color: const Color(0xFF1A1A1A),
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -464,7 +266,9 @@ class _ChatListItem extends StatelessWidget {
                           color: hasUnread
                               ? const Color(0xFFE6B800)
                               : const Color(0xFF9E9E9E),
-                          fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: hasUnread
+                              ? FontWeight.w600
+                              : FontWeight.w400,
                         ),
                       ),
                     ],
@@ -480,7 +284,9 @@ class _ChatListItem extends StatelessWidget {
                             color: hasUnread
                                 ? const Color(0xFF1A1A1A)
                                 : const Color(0xFF9E9E9E),
-                            fontWeight: hasUnread ? FontWeight.w500 : FontWeight.w400,
+                            fontWeight: hasUnread
+                                ? FontWeight.w500
+                                : FontWeight.w400,
                           ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -517,14 +323,14 @@ class _ChatListItem extends StatelessWidget {
   }
 }
 
-// ── Avatar ────────────────────────────────────────────────────────────────────
-
 class _Avatar extends StatelessWidget {
   final ChatRoom chat;
+
   const _Avatar({required this.chat});
 
   @override
   Widget build(BuildContext context) {
+    // Группа — иконка с золотым фоном
     if (chat.isGroup) {
       return Container(
         width: 50,
@@ -532,29 +338,38 @@ class _Avatar extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFFFF8E1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE6B800).withOpacity(0.3)),
+          border: Border.all(
+            color: const Color(0xFFE6B800).withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Icon(
-          chat.isClassGroup ? Icons.school_rounded : Icons.group_rounded,
+          chat.isClassGroup
+              ? Icons.school_rounded
+              : Icons.group_rounded,
           size: 24,
           color: const Color(0xFFE6B800),
         ),
       );
     }
 
+    // Личный чат — инициалы
     final initials = _getInitials(chat.name);
-    final color = _getColor(chat.id);
+    final color = _getAvatarColor(chat.id);
 
     return Container(
       width: 50,
       height: 50,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
       child: Center(
         child: Text(
           initials,
           style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
@@ -565,18 +380,80 @@ class _Avatar extends StatelessWidget {
   String _getInitials(String? name) {
     if (name == null || name.isEmpty) return '?';
     final parts = name.trim().split(' ');
-    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
     return name[0].toUpperCase();
   }
 
-  Color _getColor(String id) {
+  Color _getAvatarColor(String id) {
     const colors = [
-      Color(0xFFE6B800),
-      Color(0xFF1A1A1A),
-      Color(0xFF757575),
-      Color(0xFFCC9900),
-      Color(0xFF444444),
+      Color(0xFF5C6BC0),
+      Color(0xFF26A69A),
+      Color(0xFFEF5350),
+      Color(0xFF42A5F5),
+      Color(0xFFAB47BC),
+      Color(0xFFEC407A),
+      Color(0xFF66BB6A),
+      Color(0xFFFF7043),
     ];
-    return colors[id.hashCode.abs() % colors.length];
+    final index = id.hashCode.abs() % colors.length;
+    return colors[index];
+  }
+}
+
+// ── School chats locked until verified ───────────────────────────────────────
+
+class _SchoolChatLocked extends StatelessWidget {
+  const _SchoolChatLocked();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Blurred preview background
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(color: Colors.white.withOpacity(0.6)),
+          ),
+        ),
+        // Lock message
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64, height: 64,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF8E1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.lock_outline_rounded,
+                      size: 30, color: Color(0xFFE6B800)),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Schulchats gesperrt',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Warte auf die Freigabe durch deinen Schuladministrator.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

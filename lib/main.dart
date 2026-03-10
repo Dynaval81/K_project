@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,7 +9,7 @@ import 'package:knoty/core/controllers/auth_controller.dart';
 import 'package:knoty/core/controllers/chat_controller.dart';
 import 'package:knoty/core/controllers/tab_visibility_controller.dart';
 import 'package:knoty/presentation/screens/auth/login_screen.dart';
-import 'package:knoty/presentation/screens/auth/register_screen.dart';
+import 'package:knoty/presentation/screens/auth/register_screen.dart' as reg_screen;
 import 'package:knoty/presentation/screens/auth/registration_success_screen.dart';
 import 'package:knoty/presentation/screens/auth/email_verification_screen.dart';
 import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
@@ -28,20 +29,16 @@ void main() async {
   AppLogger.instance.init();
 
   final userProvider = UserProvider();
-  // FIX #4: chatController создаётся до authController
   final chatController = ChatController();
 
   final authController = AuthController(
-    onUserLoaded: (user) {
-      if (user != null) userProvider.setUser(user);
-      // userId обновляется через chatController напрямую из login()
-      if (user != null) chatController.updateUserId(user.matrixUserId);
+    onUserLoaded: (user) { if (user != null) userProvider.setUser(user); },
+    onMatrixUserIdLoaded: (matrixUserId) {
+      chatController.updateUserId(matrixUserId);
     },
   );
 
   await authController.tryRestoreSession();
-  // Синхронизируем userId после восстановления сессии
-  chatController.updateUserId(authController.matrixUserId);
 
   final initialLocation = authController.isAuthenticated
       ? AppRoutes.home
@@ -84,51 +81,51 @@ class _KnotyAppState extends State<KnotyApp> {
       routes: [
         GoRoute(
           path: AppRoutes.splash,
-          builder: (context, state) => const SplashScreen(),
+          pageBuilder: (context, state) => const CupertinoPage<void>(child: SplashScreen()),
         ),
         GoRoute(
           path: AppRoutes.auth,
-          builder: (context, state) => const LoginScreen(),
+          pageBuilder: (context, state) => const CupertinoPage<void>(child: LoginScreen()),
         ),
         GoRoute(
           path: '/register',
-          builder: (context, state) => const RegisterScreen(),
+          pageBuilder: (context, state) => CupertinoPage<void>(child: reg_screen.RegisterScreen()),
         ),
         GoRoute(
           path: '/verify-email',
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final extra = state.extra as Map<String, dynamic>? ?? {};
-            return EmailVerificationScreen(
+            return CupertinoPage<void>(child: EmailVerificationScreen(
               email: extra['email']?.toString() ?? '',
               nickname: extra['nickname']?.toString() ?? '',
               knotyNumber: extra['knotyNumber']?.toString() ?? '',
-            );
+            ));
           },
         ),
         GoRoute(
           path: '/register-success',
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final extra = state.extra as Map<String, dynamic>? ?? {};
-            return RegistrationSuccessScreen(
+            return CupertinoPage<void>(child: RegistrationSuccessScreen(
               nickname: extra['nickname']?.toString() ?? '',
               knotyNumber: extra['knotyNumber']?.toString() ?? '',
-            );
+            ));
           },
         ),
         GoRoute(
           path: AppRoutes.home,
-          builder: (context, state) => const MainNavShell(initialIndex: 0),
+          pageBuilder: (context, state) => CupertinoPage<void>(child: MainNavShell()),
         ),
         GoRoute(
           path: '${AppRoutes.chat}/:chatId',
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final chatId = state.pathParameters['chatId']!;
-            return _ChatScreen(chatId: chatId);
+            return CupertinoPage<void>(child: _ChatScreen(chatId: chatId));
           },
         ),
         GoRoute(
           path: AppRoutes.settings,
-          builder: (context, state) => const SettingsScreen(),
+          pageBuilder: (context, state) => const CupertinoPage<void>(child: SettingsScreen()),
         ),
       ],
       errorBuilder: (context, state) => _ErrorScreen(error: state.error),
@@ -196,7 +193,7 @@ class _ErrorScreen extends StatelessWidget {
             Text(
               error?.toString() ?? 'Unbekannter Fehler',
               style: AppTextStyles.body.copyWith(
-                color: const Color(0xFF757575),
+                color: AppColors.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),

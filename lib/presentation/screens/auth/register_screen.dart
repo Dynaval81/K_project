@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:knoty/core/constants/app_constants.dart';
@@ -262,7 +263,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       if (_step == 0) ...[
                         _RoleSelector(
                           selected: _selectedRole,
-                          onChanged: (r) => setState(() => _selectedRole = r),
+                          onChanged: (r) {
+                            setState(() => _selectedRole = r);
+                            // Сбрасываем поля предыдущей роли
+                            _schoolSearchCtrl.clear();
+                            _knChildCtrl.clear();
+                            _subjectCtrl.clear();
+                            _schoolCodeCtrl.clear();
+                            _selectedSchool = null;
+                            _hasSchoolCode = false;
+                          },
                         ),
                         const SizedBox(height: 24),
                         SizedBox(
@@ -481,7 +491,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       controller: _knChildCtrl,
       label: 'KN-Nummer des Kindes',
       hint: 'KN-XXXXXXXX',
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.number,
+      inputFormatters: [_KnNumberFormatter()],
     ),
     const SizedBox(height: 16),
     _InfoBox(text: 'Gib die KN-Nummer deines Kindes ein. Du findest sie in der Knoty-App deines Kindes.'),
@@ -887,6 +898,7 @@ class _SchoolCodeToggle extends StatelessWidget {
           label: 'Schulcode',
           hint: 'SCH-XXXX',
           keyboardType: TextInputType.text,
+          inputFormatters: [_SchCodeFormatter()],
         ),
       ],
     ]);
@@ -970,6 +982,47 @@ class _UsernameField extends StatelessWidget {
           style: TextStyle(fontSize: 11, color: Color(0xFFBBBBBB)),
         ),
       ],
+    );
+  }
+}
+
+// ── Input Formatters ──────────────────────────────────────────────────────────
+
+/// Форматирует ввод как KN-XXXXXXXX (8 цифр после KN-)
+/// Пример: 12345678 → KN-12345678
+class _KnNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Оставляем только цифры
+    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final limited = digits.length > 8 ? digits.substring(0, 8) : digits;
+    final formatted = limited.isEmpty ? '' : 'KN-$limited';
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+/// Форматирует ввод как SCH-XXXX (4 буквенно-цифровых символа)
+/// Пример: AB12 → SCH-AB12
+class _SchCodeFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final chars = newValue.text
+        .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
+        .toUpperCase();
+    final limited = chars.length > 4 ? chars.substring(0, 4) : chars;
+    final formatted = limited.isEmpty ? '' : 'SCH-$limited';
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

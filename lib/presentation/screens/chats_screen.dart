@@ -7,6 +7,7 @@ import 'package:knoty/core/controllers/chat_controller.dart';
 import 'package:knoty/data/models/chat_room.dart';
 import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
 import 'package:knoty/presentation/widgets/knoty_app_bar.dart';
+import 'package:knoty/presentation/widgets/locked_feature_wrapper.dart';
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({super.key});
@@ -115,7 +116,12 @@ class _ChatsScreenState extends State<ChatsScreen>
                   onTap: (chat) => _openChat(context, chat),
                   emptyText: 'Noch keine Schulchats',
                 )
-              : _SchoolChatLocked(),
+              : LockedFeatureWrapper(
+                  isLocked: true,
+                  title: 'Schulchats gesperrt',
+                  subtitle: 'Warte auf die Freigabe durch deinen Schuladministrator.',
+                  child: const SizedBox.expand(),
+                ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -399,61 +405,5 @@ class _Avatar extends StatelessWidget {
     ];
     final index = id.hashCode.abs() % colors.length;
     return colors[index];
-  }
-}
-
-// ── School chats locked until verified ───────────────────────────────────────
-
-class _SchoolChatLocked extends StatelessWidget {
-  const _SchoolChatLocked();
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Blurred preview background
-        Positioned.fill(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(color: Colors.white.withOpacity(0.6)),
-          ),
-        ),
-        // Lock message
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 64, height: 64,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF8E1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.lock_outline_rounded,
-                      size: 30, color: Color(0xFFE6B800)),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Schulchats gesperrt',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Warte auf die Freigabe durch deinen Schuladministrator.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }

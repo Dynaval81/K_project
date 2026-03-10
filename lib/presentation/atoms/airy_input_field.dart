@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/constants.dart';
 
 /// HAI3 Atom: Airy Input Field – single-purpose text input.
@@ -11,9 +12,10 @@ class AiryInputField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final Function(String)? onChanged;
-  final FocusNode? focusNode;
   final Function(String)? onSubmitted;
   final String? errorText;
+  final List<TextInputFormatter>? inputFormatters;
+  final FocusNode? focusNode;
 
   const AiryInputField({
     super.key,
@@ -24,10 +26,11 @@ class AiryInputField extends StatelessWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.keyboardType,
-    this.focusNode,
     this.onChanged,
     this.onSubmitted,
     this.errorText,
+    this.inputFormatters,
+    this.focusNode,
   });
 
   @override
@@ -50,12 +53,9 @@ class AiryInputField extends StatelessWidget {
           keyboardType: keyboardType,
           onChanged: onChanged,
           onSubmitted: onSubmitted,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(
-              color: AppColors.onSurface.withOpacity(0.35),
-              fontSize: 15,
-            ),
             prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.onSurfaceVariant) : null,
             suffixIcon: suffixIcon,
             errorText: errorText,

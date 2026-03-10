@@ -306,8 +306,8 @@ class MatrixChatService {
   void dispose() {
     stopSync();
     // FIX #2: закрываем контроллеры только если открыты
-    try { _roomsController.close(); } catch (_) {}
-    try { _messagesController.close(); } catch (_) {}
+    if (!_roomsController.isClosed) _roomsController.close();
+    if (!_messagesController.isClosed) _messagesController.close();
   }
 
   /// Пользовательское сообщение об ошибке без внутренних деталей

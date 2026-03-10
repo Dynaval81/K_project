@@ -135,11 +135,6 @@ class AuthController extends ChangeNotifier {
     _setUnauthenticated();
   }
 
-  // ── Legacy shim ───────────────────────────────────────────────────
-
-  /// @deprecated Используй [loginWithCredentials].
-  void login() => _setAuthenticated(_currentUser ?? _placeholderUser());
-
   // ── Private ───────────────────────────────────────────────────────
 
   /// Обновляет текущего пользователя без запроса к серверу (после активации кода).

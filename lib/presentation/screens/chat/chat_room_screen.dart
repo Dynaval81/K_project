@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:knoty/core/constants.dart';
 import 'package:knoty/core/controllers/chat_controller.dart';
 import 'package:knoty/data/models/chat_room.dart';
+import 'package:knoty/l10n/app_localizations.dart';
 import 'package:knoty/presentation/widgets/molecules/chat_input_field.dart';
 import 'package:knoty/presentation/widgets/molecules/message_bubble.dart';
 
@@ -39,13 +40,16 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     super.dispose();
   }
 
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ChatController>();
     final messages = controller.messagesForChat(widget.chat.id);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Colors.white,
       appBar: _ChatAppBar(chat: widget.chat),
       body: Column(
         children: [
@@ -65,11 +69,20 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       final msgIndex = _hadUnread ? index - 1 : index;
                       final message = messages[msgIndex];
                       final isPrevSame = msgIndex < messages.length - 1 &&
-                          messages[msgIndex + 1].isMe == message.isMe;
-                      return MessageBubble(
-                        message: message,
-                        isMe: message.isMe,
-                        isPreviousFromSameSender: isPrevSame,
+                          (messages[msgIndex + 1].senderId ?? '') == (message.senderId ?? '');
+                      // Date divider: показываем если это последнее сообщение дня
+                      final showDate = msgIndex == messages.length - 1 ||
+                          !_isSameDay(message.timestamp,
+                              messages[msgIndex + 1].timestamp);
+                      return Column(
+                        children: [
+                          if (showDate) _DateDivider(date: message.timestamp),
+                          MessageBubble(
+                            message: message,
+                            isMe: message.isMe,
+                            isPreviousFromSameSender: isPrevSame,
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -173,7 +186,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  chat.name ?? 'Unbekannt',
+                  chat.name ?? AppLocalizations.of(context)!.chatUnknown,
                   style: const TextStyle(
                     color: Color(0xFF1A1A1A),
                     fontWeight: FontWeight.w600,
@@ -183,8 +196,8 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Text(
                   chat.isGroup
-                      ? (chat.isClassGroup ? 'Klassengruppe' : 'Schulgruppe')
-                      : (chat.isOnline ? 'Online' : 'Zuletzt gesehen'),
+                      ? (chat.isClassGroup ? AppLocalizations.of(context)!.chatTypeClass : AppLocalizations.of(context)!.chatTypeSchool)
+                      : (chat.isOnline ? AppLocalizations.of(context)!.chatOnline : AppLocalizations.of(context)!.chatLastSeen),
                   style: TextStyle(
                     color: chat.isOnline && chat.isPersonal
                         ? const Color(0xFF4CAF50)
@@ -212,7 +225,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 class _EmptyChat extends StatelessWidget {
   final bool isGroup;
 
-  const _EmptyChat({required this.isGroup});
+  _EmptyChat({required this.isGroup});
 
   @override
   Widget build(BuildContext context) {
@@ -236,20 +249,14 @@ class _EmptyChat extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Noch keine Nachrichten',
-            style: TextStyle(
-              fontSize: 15,
-              color: Color(0xFF9E9E9E),
-            ),
+          Text(
+            AppLocalizations.of(context)!.chatNoMessages,
+            style: TextStyle(fontSize: 16, color: Color(0xFF9E9E9E)),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Schreibe die erste Nachricht!',
-            style: TextStyle(
-              fontSize: 13,
-              color: Color(0xFFBDBDBD),
-            ),
+          Text(
+            AppLocalizations.of(context)!.chatFirstMessage,
+            style: TextStyle(fontSize: 14, color: Color(0xFFBDBDBD)),
           ),
         ],
       ),
@@ -278,12 +285,14 @@ class _NewMessagesDivider extends StatelessWidget {
               border: Border.all(
                   color: const Color(0xFFE6B800).withOpacity(0.3)),
             ),
-            child: const Text(
-              'Neue Nachrichten',
-              style: TextStyle(
-                color: Color(0xFFE6B800),
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+            child: Builder(
+              builder: (ctx) => Text(
+                AppLocalizations.of(ctx)!.chatNewMessages,
+                style: const TextStyle(
+                  color: Color(0xFFE6B800),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -294,6 +303,47 @@ class _NewMessagesDivider extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Date divider ──────────────────────────────────────────────────────────────
+
+class _DateDivider extends StatelessWidget {
+  final DateTime date;
+  const _DateDivider({required this.date});
+
+  String _label(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final d     = DateTime(date.year, date.month, date.day);
+    final diff  = today.difference(d).inDays;
+    if (diff == 0) return AppLocalizations.of(context)!.chatDateToday;
+    if (diff == 1) return AppLocalizations.of(context)!.chatDateYesterday;
+    return '${date.day.toString().padLeft(2, '0')}.'
+           '${date.month.toString().padLeft(2, '0')}.'
+           '${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(children: [
+        Expanded(child: Divider(color: Colors.grey.withOpacity(0.18), height: 1)),
+        const SizedBox(width: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(_label(context),
+            style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E), fontWeight: FontWeight.w500)),
+        ),
+        const SizedBox(width: 10),
+        Expanded(child: Divider(color: Colors.grey.withOpacity(0.18), height: 1)),
+      ]),
     );
   }
 }

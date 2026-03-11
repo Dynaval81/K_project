@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart'; // kDebugMode
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:knoty/services/api_service.dart';
 import 'package:knoty/data/models/user_model.dart';
+import 'package:knoty/core/enums/user_role.dart';
+import 'package:knoty/core/enums/verification_level.dart';
 
 /// Результат попытки логина
 class AuthResult {
@@ -91,10 +93,91 @@ class AuthController extends ChangeNotifier {
   // ── Login ─────────────────────────────────────────────────────────
 
   /// Принимает email / VT-ID / никнейм — бэкенд различает сам.
+  // ── Demo accounts ─────────────────────────────────────────────────
+  // Временные демо-входы для тестирования UI по ролям.
+  // TODO: удалить перед продакшном.
+  static final _demoUsers = <String, User>{
+    '1': User(
+      id: 'demo-student',
+      username: 'max.mustermann',
+      email: 'student@demo.knoty',
+      knotyNumber: 'KN-00000001',
+      role: UserRole.student,
+      verificationLevel: VerificationLevel.verified,
+      schoolId: 'demo-school',
+    ),
+    '2': User(
+      id: 'demo-parent',
+      username: 'anna.mueller',
+      email: 'parent@demo.knoty',
+      knotyNumber: 'KN-00000002',
+      role: UserRole.parent,
+      verificationLevel: VerificationLevel.verified,
+      linkedChildId: 'KN-00000001',
+    ),
+    '3': User(
+      id: 'demo-teacher',
+      username: 'herr.schmidt',
+      email: 'teacher@demo.knoty',
+      knotyNumber: 'KN-00000003',
+      role: UserRole.teacher,
+      verificationLevel: VerificationLevel.verified,
+      schoolId: 'demo-school',
+    ),
+    '4': User(
+      id: 'demo-admin',
+      username: 'schuladmin',
+      email: 'admin@demo.knoty',
+      knotyNumber: 'KN-00000004',
+      role: UserRole.schoolAdmin,
+      verificationLevel: VerificationLevel.verified,
+      schoolId: 'demo-school',
+    ),
+    // ── Unverified demo accounts ───────────────────────────────────
+    '11': User(
+      id: 'demo-student-unverified',
+      username: 'lena.bauer',
+      email: 'student2@demo.knoty',
+      knotyNumber: 'KN-00000011',
+      role: UserRole.student,
+      verificationLevel: VerificationLevel.none,
+    ),
+    '12': User(
+      id: 'demo-parent-unverified',
+      username: 'thomas.weber',
+      email: 'parent2@demo.knoty',
+      knotyNumber: 'KN-00000012',
+      role: UserRole.parent,
+      verificationLevel: VerificationLevel.none,
+    ),
+    '13': User(
+      id: 'demo-teacher-unverified',
+      username: 'frau.klein',
+      email: 'teacher2@demo.knoty',
+      knotyNumber: 'KN-00000013',
+      role: UserRole.teacher,
+      verificationLevel: VerificationLevel.none,
+    ),
+    '14': User(
+      id: 'demo-admin-unverified',
+      username: 'schuladmin2',
+      email: 'admin2@demo.knoty',
+      knotyNumber: 'KN-00000014',
+      role: UserRole.schoolAdmin,
+      verificationLevel: VerificationLevel.none,
+    ),
+  };
+
   Future<AuthResult> loginWithCredentials({
     required String identifier,
     required String password,
   }) async {
+    // Demo shortcut: логин 1-4, пароль 123456
+    if (password == '123456' && _demoUsers.containsKey(identifier.trim())) {
+      _setAuthenticated(_demoUsers[identifier.trim()]!);
+      return AuthResult.ok();
+    }
+
     try {
       final response = await _api.login(email: identifier, password: password);
 

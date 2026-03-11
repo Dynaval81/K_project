@@ -1,13 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:knoty/core/controllers/auth_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:knoty/core/controllers/chat_controller.dart';
 import 'package:knoty/data/models/chat_room.dart';
 import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
 import 'package:knoty/presentation/widgets/knoty_app_bar.dart';
-import 'package:knoty/presentation/widgets/locked_feature_wrapper.dart';
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({super.key});
@@ -24,7 +21,7 @@ class _ChatsScreenState extends State<ChatsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = context.read<ChatController>();
       if (controller.chatRooms.isEmpty) {
@@ -56,8 +53,6 @@ class _ChatsScreenState extends State<ChatsScreen>
     final allRooms = controller.chatRooms;
     final personal = allRooms.where((c) => c.isPersonal).toList();
     final groups = allRooms.where((c) => c.isGroup).toList();
-    final school = allRooms.where((c) => c.isSchool).toList();
-    final isSchoolVerified = context.watch<AuthController>().currentUser?.isSchoolVerified ?? false;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -77,28 +72,14 @@ class _ChatsScreenState extends State<ChatsScreen>
             fontSize: 14,
             fontWeight: FontWeight.w400,
           ),
-          tabs: [
-            const Tab(text: 'Persönlich'),
-            const Tab(text: 'Gruppen'),
-            Tab(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Schule'),
-                  if (!isSchoolVerified) ...[
-                    const SizedBox(width: 4),
-                    const Icon(Icons.lock_rounded, size: 12,
-                        color: Color(0xFF9E9E9E)),
-                  ],
-                ],
-              ),
-            ),
+          tabs: const [
+            Tab(text: 'Persönlich'),
+            Tab(text: 'Gruppen'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        physics: const NeverScrollableScrollPhysics(),
         children: [
           _ChatList(
             rooms: personal,
@@ -110,18 +91,6 @@ class _ChatsScreenState extends State<ChatsScreen>
             onTap: (chat) => _openChat(context, chat),
             emptyText: 'Noch keine Gruppen',
           ),
-          isSchoolVerified
-              ? _ChatList(
-                  rooms: school,
-                  onTap: (chat) => _openChat(context, chat),
-                  emptyText: 'Noch keine Schulchats',
-                )
-              : LockedFeatureWrapper(
-                  isLocked: true,
-                  title: 'Schulchats gesperrt',
-                  subtitle: 'Warte auf die Freigabe durch deinen Schuladministrator.',
-                  child: const SizedBox.expand(),
-                ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -284,7 +253,7 @@ class _ChatListItem extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          chat.lastMessage ?? '',
+                          _emojiPreview(chat.lastMessage),
                           style: TextStyle(
                             fontSize: 13,
                             color: hasUnread
@@ -406,4 +375,14 @@ class _Avatar extends StatelessWidget {
     final index = id.hashCode.abs() % colors.length;
     return colors[index];
   }
+/// Converts [icon_name] codes in chat preview to readable emoji
+String _emojiPreview(String? text) {
+  if (text == null || text.isEmpty) return '';
+  final cleaned = text.replaceAllMapped(
+    RegExp(r'\[([^\]]+)\]'),
+    (m) => m.group(1)!.startsWith('icon_') ? '🙂' : '🖼',
+  ).trim();
+  return cleaned.isEmpty ? '🙂' : cleaned;
+}
+
 }

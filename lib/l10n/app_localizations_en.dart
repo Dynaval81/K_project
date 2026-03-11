@@ -76,10 +76,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginErrorGeneric => 'Sign in error. Please try again.';
 
   @override
-  String get registerTitle => 'Sign Up';
+  String get registerTitle => 'Register';
 
   @override
-  String get registerSubtitle => 'Create a new account';
+  String get registerSubtitle => 'Create account';
 
   @override
   String get registerEmailLabel => 'Email';
@@ -232,8 +232,196 @@ class AppLocalizationsEn extends AppLocalizations {
   String get curfewMessage => 'The app is locked until tomorrow morning.';
 
   @override
+  String get schoolTitle => 'School';
+
+  @override
+  String get schoolNotVerifiedTitle => 'School not confirmed yet';
+
+  @override
+  String get schoolNotVerifiedSubtitle =>
+      'Enter your school code or wait for confirmation from your school.';
+
+  @override
+  String get schoolCodeHint => 'SCH-XXXX';
+
+  @override
+  String get schoolCodeRedeem => 'Redeem Code';
+
+  @override
+  String get schoolCodeInvalid => 'Invalid code. Please check and try again.';
+
+  @override
+  String get schoolCodeEmpty => 'Please enter school code';
+
+  @override
+  String get schoolWaitingConfirmation => 'Waiting for school confirmation';
+
+  @override
+  String schoolWaitingFrom(String school) {
+    return 'Waiting for confirmation from\n$school';
+  }
+
+  @override
+  String get schoolServicesTitle => 'Services';
+
+  @override
+  String get schoolTimetable => 'Timetable';
+
+  @override
+  String get schoolAnnouncements => 'Announcements';
+
+  @override
+  String get schoolDocuments => 'Documents';
+
+  @override
+  String get schoolHomework => 'Homework';
+
+  @override
+  String get schoolGrades => 'Grades';
+
+  @override
+  String get schoolEvents => 'Events';
+
+  @override
+  String get schoolUpcomingTitle => 'Upcoming Events';
+
+  @override
+  String get schoolStatClass => 'Class';
+
+  @override
+  String get schoolStatStatus => 'Status';
+
+  @override
+  String get schoolStatNew => 'New';
+
+  @override
+  String get schoolStatActive => 'Active';
+
+  @override
+  String get schoolVerifiedBadge => 'Verified';
+
+  @override
+  String schoolComingSoon(String name) {
+    return '$name — coming soon';
+  }
+
+  @override
+  String get settingsTabsTitle => 'Visible Tabs';
+
+  @override
+  String get settingsTabChats => 'Chats';
+
+  @override
+  String get settingsTabAi => 'AI Assistant';
+
+  @override
+  String get settingsTabSchool => 'School';
+
+  @override
+  String get settingsTabKind => 'Child';
+
+  @override
+  String get lockedDefaultTitle => 'Locked';
+
+  @override
+  String get lockedDefaultSubtitle => 'Waiting for administrator approval.';
+
+  @override
+  String get lockedSchoolChatsTitle => 'School Chats Locked';
+
+  @override
+  String get lockedSchoolChatsSubtitle =>
+      'Waiting for approval from your school administrator.';
+
+  @override
+  String get lockedNoChildTitle => 'No child linked';
+
+  @override
+  String get lockedNoChildSubtitle =>
+      'Link your account with your child\'s KN code in settings.';
+
+  @override
+  String get lockedTeacherTitle => 'Access Restricted';
+
+  @override
+  String get lockedTeacherSubtitle =>
+      'Waiting for verification by your school administrator.';
+
+  @override
+  String get verwaltungTitle => 'Administration';
+
+  @override
+  String get verwaltungActivateUsers => 'Activate Users';
+
+  @override
+  String get verwaltungActivateUsersSubtitle =>
+      'Approve students, teachers and parents';
+
+  @override
+  String get verwaltungGenerateCodes => 'Generate School Codes';
+
+  @override
+  String get verwaltungGenerateCodesSubtitle =>
+      'SCH-XXXX codes for registration';
+
+  @override
+  String get verwaltungUserList => 'User List';
+
+  @override
+  String get verwaltungUserListSubtitle => 'Manage all school members';
+
+  @override
+  String get verwaltungSuperAdminHint =>
+      'Full administration available via the web panel.';
+
+  @override
+  String get parentTitle => 'Child';
+
+  @override
+  String get teacherClassesTitle => 'My Classes';
+
+  @override
+  String get teacherClassesComingSoon => 'Class area — coming soon';
+
+  @override
   String get loginPrimaryButton => 'Continue';
 
   @override
-  String get splashHai3Label => 'Gebaut nach HAI³-Philosophie';
+  String get splashHai3Label => 'Educational Messenger';
+
+  @override
+  String get settingsTabClasses => 'My Classes';
+
+  @override
+  String get settingsTabVerwaltung => 'Administration';
+
+  @override
+  String get chatTypeClass => 'Class group';
+
+  @override
+  String get chatTypeSchool => 'School group';
+
+  @override
+  String get chatOnline => 'Online';
+
+  @override
+  String get chatLastSeen => 'Last seen';
+
+  @override
+  String get chatUnknown => 'Unknown';
+
+  @override
+  String get chatNoMessages => 'No messages yet';
+
+  @override
+  String get chatFirstMessage => 'Write the first message!';
+
+  @override
+  String get chatNewMessages => 'New messages';
+
+  @override
+  String get chatDateToday => 'Today';
+
+  @override
+  String get chatDateYesterday => 'Yesterday';
 }

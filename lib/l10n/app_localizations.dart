@@ -235,13 +235,13 @@ abstract class AppLocalizations {
   /// No description provided for @registerTitle.
   ///
   /// In de, this message translates to:
-  /// **'Registrierung'**
+  /// **'Registrieren'**
   String get registerTitle;
 
   /// No description provided for @registerSubtitle.
   ///
   /// In de, this message translates to:
-  /// **'Neues Konto anlegen'**
+  /// **'Konto erstellen'**
   String get registerSubtitle;
 
   /// No description provided for @registerEmailLabel.
@@ -283,7 +283,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerButton.
   ///
   /// In de, this message translates to:
-  /// **'Jetzt registrieren'**
+  /// **'Konto erstellen'**
   String get registerButton;
 
   /// No description provided for @registerHaveAccount.
@@ -538,6 +538,288 @@ abstract class AppLocalizations {
   /// **'Die App ist bis morgen früh gesperrt.'**
   String get curfewMessage;
 
+  /// No description provided for @schoolTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Schule'**
+  String get schoolTitle;
+
+  /// No description provided for @schoolNotVerifiedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Schule noch nicht bestätigt'**
+  String get schoolNotVerifiedTitle;
+
+  /// No description provided for @schoolNotVerifiedSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Gib den Code deiner Schule ein oder warte auf die Bestätigung.'**
+  String get schoolNotVerifiedSubtitle;
+
+  /// No description provided for @schoolCodeHint.
+  ///
+  /// In de, this message translates to:
+  /// **'SCH-XXXX'**
+  String get schoolCodeHint;
+
+  /// No description provided for @schoolCodeRedeem.
+  ///
+  /// In de, this message translates to:
+  /// **'Code einlösen'**
+  String get schoolCodeRedeem;
+
+  /// No description provided for @schoolCodeInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Ungültiger Code. Bitte prüfe und versuche es erneut.'**
+  String get schoolCodeInvalid;
+
+  /// No description provided for @schoolCodeEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gib den Schulcode ein'**
+  String get schoolCodeEmpty;
+
+  /// No description provided for @schoolWaitingConfirmation.
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf Schulbestätigung'**
+  String get schoolWaitingConfirmation;
+
+  /// No description provided for @schoolWaitingFrom.
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf Bestätigung von\n{school}'**
+  String schoolWaitingFrom(String school);
+
+  /// No description provided for @schoolServicesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Dienste'**
+  String get schoolServicesTitle;
+
+  /// No description provided for @schoolTimetable.
+  ///
+  /// In de, this message translates to:
+  /// **'Stundenplan'**
+  String get schoolTimetable;
+
+  /// No description provided for @schoolAnnouncements.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitteilungen'**
+  String get schoolAnnouncements;
+
+  /// No description provided for @schoolDocuments.
+  ///
+  /// In de, this message translates to:
+  /// **'Dokumente'**
+  String get schoolDocuments;
+
+  /// No description provided for @schoolHomework.
+  ///
+  /// In de, this message translates to:
+  /// **'Hausaufgaben'**
+  String get schoolHomework;
+
+  /// No description provided for @schoolGrades.
+  ///
+  /// In de, this message translates to:
+  /// **'Noten'**
+  String get schoolGrades;
+
+  /// No description provided for @schoolEvents.
+  ///
+  /// In de, this message translates to:
+  /// **'Veranstaltungen'**
+  String get schoolEvents;
+
+  /// No description provided for @schoolUpcomingTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Nächste Ereignisse'**
+  String get schoolUpcomingTitle;
+
+  /// No description provided for @schoolStatClass.
+  ///
+  /// In de, this message translates to:
+  /// **'Klasse'**
+  String get schoolStatClass;
+
+  /// No description provided for @schoolStatStatus.
+  ///
+  /// In de, this message translates to:
+  /// **'Status'**
+  String get schoolStatStatus;
+
+  /// No description provided for @schoolStatNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neu'**
+  String get schoolStatNew;
+
+  /// No description provided for @schoolStatActive.
+  ///
+  /// In de, this message translates to:
+  /// **'Aktiv'**
+  String get schoolStatActive;
+
+  /// No description provided for @schoolVerifiedBadge.
+  ///
+  /// In de, this message translates to:
+  /// **'Verifiziert'**
+  String get schoolVerifiedBadge;
+
+  /// No description provided for @schoolComingSoon.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} — kommt bald'**
+  String schoolComingSoon(String name);
+
+  /// No description provided for @settingsTabsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Sichtbare Tabs'**
+  String get settingsTabsTitle;
+
+  /// No description provided for @settingsTabChats.
+  ///
+  /// In de, this message translates to:
+  /// **'Chats'**
+  String get settingsTabChats;
+
+  /// No description provided for @settingsTabAi.
+  ///
+  /// In de, this message translates to:
+  /// **'KI-Assistent'**
+  String get settingsTabAi;
+
+  /// No description provided for @settingsTabSchool.
+  ///
+  /// In de, this message translates to:
+  /// **'Schule'**
+  String get settingsTabSchool;
+
+  /// No description provided for @settingsTabKind.
+  ///
+  /// In de, this message translates to:
+  /// **'Kind'**
+  String get settingsTabKind;
+
+  /// No description provided for @lockedDefaultTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Gesperrt'**
+  String get lockedDefaultTitle;
+
+  /// No description provided for @lockedDefaultSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf die Freigabe durch deinen Administrator.'**
+  String get lockedDefaultSubtitle;
+
+  /// No description provided for @lockedSchoolChatsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Schulchats gesperrt'**
+  String get lockedSchoolChatsTitle;
+
+  /// No description provided for @lockedSchoolChatsSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf die Freigabe durch deinen Schuladministrator.'**
+  String get lockedSchoolChatsSubtitle;
+
+  /// No description provided for @lockedNoChildTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Kind verknüpft'**
+  String get lockedNoChildTitle;
+
+  /// No description provided for @lockedNoChildSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Verknüpfe dein Konto mit dem KN-Code deines Kindes in den Einstellungen.'**
+  String get lockedNoChildSubtitle;
+
+  /// No description provided for @lockedTeacherTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugang gesperrt'**
+  String get lockedTeacherTitle;
+
+  /// No description provided for @lockedTeacherSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf die Verifizierung durch deinen Schuladministrator.'**
+  String get lockedTeacherSubtitle;
+
+  /// No description provided for @verwaltungTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Verwaltung'**
+  String get verwaltungTitle;
+
+  /// No description provided for @verwaltungActivateUsers.
+  ///
+  /// In de, this message translates to:
+  /// **'Benutzer aktivieren'**
+  String get verwaltungActivateUsers;
+
+  /// No description provided for @verwaltungActivateUsersSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Schüler, Lehrer und Eltern freischalten'**
+  String get verwaltungActivateUsersSubtitle;
+
+  /// No description provided for @verwaltungGenerateCodes.
+  ///
+  /// In de, this message translates to:
+  /// **'Schulcodes generieren'**
+  String get verwaltungGenerateCodes;
+
+  /// No description provided for @verwaltungGenerateCodesSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'SCH-XXXX Codes für die Registrierung'**
+  String get verwaltungGenerateCodesSubtitle;
+
+  /// No description provided for @verwaltungUserList.
+  ///
+  /// In de, this message translates to:
+  /// **'Benutzerliste'**
+  String get verwaltungUserList;
+
+  /// No description provided for @verwaltungUserListSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Schulmitglieder verwalten'**
+  String get verwaltungUserListSubtitle;
+
+  /// No description provided for @verwaltungSuperAdminHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Vollständige Verwaltung über das Web-Panel verfügbar.'**
+  String get verwaltungSuperAdminHint;
+
+  /// No description provided for @parentTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kind'**
+  String get parentTitle;
+
+  /// No description provided for @teacherClassesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Meine Klassen'**
+  String get teacherClassesTitle;
+
+  /// No description provided for @teacherClassesComingSoon.
+  ///
+  /// In de, this message translates to:
+  /// **'Klassenbereich — kommt bald'**
+  String get teacherClassesComingSoon;
+
   /// No description provided for @loginPrimaryButton.
   ///
   /// In de, this message translates to:
@@ -547,8 +829,80 @@ abstract class AppLocalizations {
   /// No description provided for @splashHai3Label.
   ///
   /// In de, this message translates to:
-  /// **'Gebaut nach HAI³-Philosophie'**
+  /// **'Bildungs-Messenger'**
   String get splashHai3Label;
+
+  /// No description provided for @settingsTabClasses.
+  ///
+  /// In de, this message translates to:
+  /// **'Meine Klassen'**
+  String get settingsTabClasses;
+
+  /// No description provided for @settingsTabVerwaltung.
+  ///
+  /// In de, this message translates to:
+  /// **'Verwaltung'**
+  String get settingsTabVerwaltung;
+
+  /// No description provided for @chatTypeClass.
+  ///
+  /// In de, this message translates to:
+  /// **'Klassengruppe'**
+  String get chatTypeClass;
+
+  /// No description provided for @chatTypeSchool.
+  ///
+  /// In de, this message translates to:
+  /// **'Schulgruppe'**
+  String get chatTypeSchool;
+
+  /// No description provided for @chatOnline.
+  ///
+  /// In de, this message translates to:
+  /// **'Online'**
+  String get chatOnline;
+
+  /// No description provided for @chatLastSeen.
+  ///
+  /// In de, this message translates to:
+  /// **'Zuletzt gesehen'**
+  String get chatLastSeen;
+
+  /// No description provided for @chatUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Unbekannt'**
+  String get chatUnknown;
+
+  /// No description provided for @chatNoMessages.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Nachrichten'**
+  String get chatNoMessages;
+
+  /// No description provided for @chatFirstMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Schreibe die erste Nachricht!'**
+  String get chatFirstMessage;
+
+  /// No description provided for @chatNewMessages.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Nachrichten'**
+  String get chatNewMessages;
+
+  /// No description provided for @chatDateToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Heute'**
+  String get chatDateToday;
+
+  /// No description provided for @chatDateYesterday.
+  ///
+  /// In de, this message translates to:
+  /// **'Gestern'**
+  String get chatDateYesterday;
 }
 
 class _AppLocalizationsDelegate

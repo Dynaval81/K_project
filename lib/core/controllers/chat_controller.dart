@@ -1,158 +1,149 @@
-import 'dart:async';
+import 'dart:math' show Random;
 import 'package:flutter/foundation.dart';
-import 'package:knoty/core/services/matrix_chat_service.dart';
 import 'package:knoty/core/services/chat_service.dart';
+import 'package:knoty/data/models/chat_model.dart';
 import 'package:knoty/data/models/chat_room.dart';
 import 'package:knoty/data/models/message_model.dart';
+import 'package:knoty/logic/chat_manager.dart';
 
-/// Chat state controller backed by Matrix Synapse.
+/// Single chat state controller (Provider-only).
 class ChatController extends ChangeNotifier {
-  // FIX #4: matrixUserId обновляется после init через updateUserId()
-  String? _matrixUserId;
-  String? get matrixUserId => _matrixUserId;
-
-  ChatController({String? matrixUserId}) : _matrixUserId = matrixUserId {
-    _subscribeToStreams();
+  ChatController() {
+    _chatRooms = List.from(ChatManager.chats);
+    _messages  = List.from(ChatManager.messages);
+    _chats     = _chatRooms.map((r) => ChatModel.fromChatRoom(r)).toList();
   }
 
-  final MatrixChatService _matrix = MatrixChatService();
   final ChatService _chatService = ChatService();
-
-  List<ChatRoom> _chatRooms = [];
-  // FIX #2: используем копии списков чтобы избежать race condition
-  final Map<String, List<MessageModel>> _messagesByRoom = {};
-  bool _isLoading = false;
+  List<ChatRoom>    _chatRooms   = [];
+  List<MessageModel> _messages   = [];
+  List<ChatModel>   _chats       = [];
+  bool   _isLoading = false;
   String? _error;
 
-  List<ChatRoom> get chatRooms => List.unmodifiable(_chatRooms);
-  bool get isLoading => _isLoading;
-  String? get error => _error;
+  List<ChatRoom>    get chatRooms => List.unmodifiable(_chatRooms);
+  List<MessageModel> get messages => List.unmodifiable(_messages);
+  bool   get isLoading => _isLoading;
+  String? get error    => _error;
+  List<ChatModel> get chats => List.unmodifiable(_chats);
 
-  StreamSubscription<List<ChatRoom>>? _roomsSub;
-  StreamSubscription<List<MessageModel>>? _messagesSub;
-
-  // FIX #4: вызывается из main.dart после восстановления сессии
-  void updateUserId(String? userId) {
-    if (_matrixUserId == userId) return;
-    _matrixUserId = userId;
-    _matrix.setUserContext(userId: userId);
-  }
-
-  void _subscribeToStreams() {
-    _roomsSub = _matrix.roomsStream.listen((rooms) {
-      _chatRooms = List.of(rooms); // копия
-      notifyListeners();
-    });
-
-    _messagesSub = _matrix.messagesStream.listen((newMessages) {
-      for (final msg in newMessages) {
-        final roomId = msg.chatId ?? '';
-        // Атомарное обновление через putIfAbsent + работа только с актуальным списком
-        final list = _messagesByRoom.putIfAbsent(roomId, () => []);
-        if (!list.any((m) => m.id == msg.id)) {
-          final corrected = _matrixUserId != null
-              ? msg.copyWith(isMe: msg.senderId == _matrixUserId)
-              : msg;
-          list.insert(0, corrected);
-        }
-      }
-      notifyListeners();
-    });
-  }
-
-  Future<void> loadChatRooms({String? school, String? schoolClass}) async {
+  Future<void> loadChatRooms() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
-
     try {
-      _matrix.setUserContext(
-        school: school,
-        schoolClass: schoolClass,
-        userId: _matrixUserId,
-      );
-      _matrix.startSync();
-    } catch (e) {
-      _error = 'Fehler beim Laden: ${e.toString()}';
+      await Future.delayed(const Duration(milliseconds: 300));
+      _chatRooms = List.from(ChatManager.chats);
+      _messages  = List.from(ChatManager.messages);
+      _chats     = _chatRooms.map((r) => ChatModel.fromChatRoom(r)).toList();
+    } catch (e, stack) {
+      _error = 'Fehler beim Laden';
+      debugPrint('[Chat] loadChats error: $e\n$stack');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> loadHistory(String roomId) async {
-    if (_messagesByRoom.containsKey(roomId)) return;
-
-    final history = await _matrix.loadHistory(
-      roomId,
-      currentUserId: _matrixUserId,
-    );
-    // FIX #2: присваиваем новый список
-    _messagesByRoom[roomId] = List.of(history);
+  void markAsRead(String chatId) {
+    // Sync both collections atomically
+    ChatManager.markAsRead(chatId);
+    _chatRooms = List.from(ChatManager.chats);
+    final idx = _chats.indexWhere((c) => c.id == chatId);
+    if (idx >= 0) _chats[idx].markAsRead();
+    final ri = _chatRooms.indexWhere((r) => r.id == chatId);
+    if (ri >= 0) _chatRooms[ri].unread = 0;
     notifyListeners();
   }
 
-  void markAsRead(String chatId) {
-    final idx = _chatRooms.indexWhere((r) => r.id == chatId);
-    if (idx >= 0) {
-      // FIX #2: создаём новый список вместо мутации
-      final updated = List<ChatRoom>.of(_chatRooms);
-      updated[idx] = updated[idx].copyWith(unread: 0);
-      _chatRooms = updated;
+  Future<void> sendMessage(String chatRoomId, String text) async {
+    final trimmed = text.trim();
+    if (!_chatService.validateMessage(trimmed)) {
+      _error = trimmed.isEmpty
+          ? 'Nachricht darf nicht leer sein'
+          : 'Nachricht zu lang (max. 1000 Zeichen)';
       notifyListeners();
+      return;
     }
-  }
-
-  Future<void> sendMessage(String roomId, String text) async {
-    if (!_chatService.validateMessage(text)) return;
-
-    final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
-    final tempMsg = MessageModel(
-      id: tempId,
-      text: text.trim(),
-      chatId: roomId,
-      senderId: _matrixUserId ?? 'me',
+    final newMessage = MessageModel(
+      id: '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(0x7FFFFFFF)}',
+      text: _chatService.parseMessageText(text),
+      chatId: chatRoomId,
+      senderId: 'me',
       isMe: true,
       timestamp: DateTime.now(),
       status: MessageStatus.sending,
     );
-
-    // FIX #2: работаем с копией чтобы избежать race condition
-    final listBefore = List<MessageModel>.of(_messagesByRoom[roomId] ?? []);
-    listBefore.insert(0, tempMsg);
-    _messagesByRoom[roomId] = listBefore;
+    _messages.add(newMessage);
     notifyListeners();
 
-    final success = await _matrix.sendMessage(roomId, text.trim());
-
-    // Берём актуальный список (мог обновиться за время отправки)
-    final list = _messagesByRoom[roomId];
-    if (list != null) {
-      final idx = list.indexWhere((m) => m.id == tempId);
-      if (idx >= 0) {
-        list[idx] = tempMsg.copyWith(
-          status: success ? MessageStatus.sent : MessageStatus.failed,
+    try {
+      await Future.delayed(const Duration(milliseconds: 400));
+      final i = _messages.indexWhere((m) => m.id == newMessage.id);
+      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.sent);
+      ChatManager.messages.add(newMessage.copyWith(status: MessageStatus.sent));
+      // Update lastMessage in chatRoom
+      final ri = _chatRooms.indexWhere((r) => r.id == chatRoomId);
+      if (ri >= 0) {
+        _chatRooms[ri] = _chatRooms[ri].copyWith(
+          lastMessage: _previewText(text),
+          lastMessageTime: DateTime.now(),
         );
-        notifyListeners();
       }
-      // Если temp не найден — sync уже пришёл с реальным сообщением, всё ок
+      _error = null;
+    } on FormatException catch (e) {
+      final i = _messages.indexWhere((m) => m.id == newMessage.id);
+      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.failed);
+      _error = 'Ungültiges Nachrichtenformat';
+      debugPrint('[Chat] FormatException: $e');
+    } on StateError catch (e) {
+      final i = _messages.indexWhere((m) => m.id == newMessage.id);
+      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.failed);
+      _error = 'Chat nicht gefunden';
+      debugPrint('[Chat] StateError: $e');
+    } catch (e, stack) {
+      final i = _messages.indexWhere((m) => m.id == newMessage.id);
+      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.failed);
+      _error = 'Fehler beim Senden';
+      debugPrint('[Chat] sendMessage error: $e
+$stack');
     }
+    notifyListeners();
   }
 
+  /// Возвращает сообщения для чата, новейшие первыми (для reverse ListView).
   List<MessageModel> messagesForChat(String chatId) {
-    return List.unmodifiable(_messagesByRoom[chatId] ?? []);
+    final list = _messages.where((m) => m.chatId == chatId).toList();
+    list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return list;
   }
+
+  int getUnreadCount(String chatId) {
+    final idx = _chats.indexWhere((c) => c.id == chatId);
+    if (idx < 0) return 0; // chat not found — not an error
+    return _chats[idx].unreadCount;
+  }
+
+  /// Stub для совместимости с main.dart (Matrix userId не используется в mock-режиме)
+  // ignore: avoid_setters_without_getters
+  void updateUserId(String? userId) {}
 
   void clearError() {
     _error = null;
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    _roomsSub?.cancel();
-    _messagesSub?.cancel();
-    _matrix.dispose();
-    super.dispose();
+  /// Converts [icon_name] emoji codes to a readable preview string
+  static String _previewText(String text) {
+    final cleaned = text.replaceAllMapped(
+      RegExp(r'\[([^\]]+)\]'),
+      (m) {
+        final code = m.group(1) ?? '';
+        // Map common icons to descriptive labels
+        if (code.startsWith('icon_')) return '🙂';
+        return '🖼';  // GIF sticker
+      },
+    ).trim();
+    return cleaned.isEmpty ? '🙂' : cleaned;
   }
 }

@@ -76,10 +76,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loginErrorGeneric => 'Anmeldefehler. Bitte erneut versuchen.';
 
   @override
-  String get registerTitle => 'Registrierung';
+  String get registerTitle => 'Registrieren';
 
   @override
-  String get registerSubtitle => 'Neues Konto anlegen';
+  String get registerSubtitle => 'Konto erstellen';
 
   @override
   String get registerEmailLabel => 'E-Mail';
@@ -100,7 +100,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get registerNicknameHint => 'Spitznamen eingeben';
 
   @override
-  String get registerButton => 'Jetzt registrieren';
+  String get registerButton => 'Konto erstellen';
 
   @override
   String get registerHaveAccount => 'Bereits ein Konto? ';
@@ -231,8 +231,198 @@ class AppLocalizationsDe extends AppLocalizations {
   String get curfewMessage => 'Die App ist bis morgen früh gesperrt.';
 
   @override
+  String get schoolTitle => 'Schule';
+
+  @override
+  String get schoolNotVerifiedTitle => 'Schule noch nicht bestätigt';
+
+  @override
+  String get schoolNotVerifiedSubtitle =>
+      'Gib den Code deiner Schule ein oder warte auf die Bestätigung.';
+
+  @override
+  String get schoolCodeHint => 'SCH-XXXX';
+
+  @override
+  String get schoolCodeRedeem => 'Code einlösen';
+
+  @override
+  String get schoolCodeInvalid =>
+      'Ungültiger Code. Bitte prüfe und versuche es erneut.';
+
+  @override
+  String get schoolCodeEmpty => 'Bitte gib den Schulcode ein';
+
+  @override
+  String get schoolWaitingConfirmation => 'Warte auf Schulbestätigung';
+
+  @override
+  String schoolWaitingFrom(String school) {
+    return 'Warte auf Bestätigung von\n$school';
+  }
+
+  @override
+  String get schoolServicesTitle => 'Dienste';
+
+  @override
+  String get schoolTimetable => 'Stundenplan';
+
+  @override
+  String get schoolAnnouncements => 'Mitteilungen';
+
+  @override
+  String get schoolDocuments => 'Dokumente';
+
+  @override
+  String get schoolHomework => 'Hausaufgaben';
+
+  @override
+  String get schoolGrades => 'Noten';
+
+  @override
+  String get schoolEvents => 'Veranstaltungen';
+
+  @override
+  String get schoolUpcomingTitle => 'Nächste Ereignisse';
+
+  @override
+  String get schoolStatClass => 'Klasse';
+
+  @override
+  String get schoolStatStatus => 'Status';
+
+  @override
+  String get schoolStatNew => 'Neu';
+
+  @override
+  String get schoolStatActive => 'Aktiv';
+
+  @override
+  String get schoolVerifiedBadge => 'Verifiziert';
+
+  @override
+  String schoolComingSoon(String name) {
+    return '$name — kommt bald';
+  }
+
+  @override
+  String get settingsTabsTitle => 'Sichtbare Tabs';
+
+  @override
+  String get settingsTabChats => 'Chats';
+
+  @override
+  String get settingsTabAi => 'KI-Assistent';
+
+  @override
+  String get settingsTabSchool => 'Schule';
+
+  @override
+  String get settingsTabKind => 'Kind';
+
+  @override
+  String get lockedDefaultTitle => 'Gesperrt';
+
+  @override
+  String get lockedDefaultSubtitle =>
+      'Warte auf die Freigabe durch deinen Administrator.';
+
+  @override
+  String get lockedSchoolChatsTitle => 'Schulchats gesperrt';
+
+  @override
+  String get lockedSchoolChatsSubtitle =>
+      'Warte auf die Freigabe durch deinen Schuladministrator.';
+
+  @override
+  String get lockedNoChildTitle => 'Kein Kind verknüpft';
+
+  @override
+  String get lockedNoChildSubtitle =>
+      'Verknüpfe dein Konto mit dem KN-Code deines Kindes in den Einstellungen.';
+
+  @override
+  String get lockedTeacherTitle => 'Zugang gesperrt';
+
+  @override
+  String get lockedTeacherSubtitle =>
+      'Warte auf die Verifizierung durch deinen Schuladministrator.';
+
+  @override
+  String get verwaltungTitle => 'Verwaltung';
+
+  @override
+  String get verwaltungActivateUsers => 'Benutzer aktivieren';
+
+  @override
+  String get verwaltungActivateUsersSubtitle =>
+      'Schüler, Lehrer und Eltern freischalten';
+
+  @override
+  String get verwaltungGenerateCodes => 'Schulcodes generieren';
+
+  @override
+  String get verwaltungGenerateCodesSubtitle =>
+      'SCH-XXXX Codes für die Registrierung';
+
+  @override
+  String get verwaltungUserList => 'Benutzerliste';
+
+  @override
+  String get verwaltungUserListSubtitle => 'Alle Schulmitglieder verwalten';
+
+  @override
+  String get verwaltungSuperAdminHint =>
+      'Vollständige Verwaltung über das Web-Panel verfügbar.';
+
+  @override
+  String get parentTitle => 'Kind';
+
+  @override
+  String get teacherClassesTitle => 'Meine Klassen';
+
+  @override
+  String get teacherClassesComingSoon => 'Klassenbereich — kommt bald';
+
+  @override
   String get loginPrimaryButton => 'Weiter';
 
   @override
-  String get splashHai3Label => 'Gebaut nach HAI³-Philosophie';
+  String get splashHai3Label => 'Bildungs-Messenger';
+
+  @override
+  String get settingsTabClasses => 'Meine Klassen';
+
+  @override
+  String get settingsTabVerwaltung => 'Verwaltung';
+
+  @override
+  String get chatTypeClass => 'Klassengruppe';
+
+  @override
+  String get chatTypeSchool => 'Schulgruppe';
+
+  @override
+  String get chatOnline => 'Online';
+
+  @override
+  String get chatLastSeen => 'Zuletzt gesehen';
+
+  @override
+  String get chatUnknown => 'Unbekannt';
+
+  @override
+  String get chatNoMessages => 'Noch keine Nachrichten';
+
+  @override
+  String get chatFirstMessage => 'Schreibe die erste Nachricht!';
+
+  @override
+  String get chatNewMessages => 'Neue Nachrichten';
+
+  @override
+  String get chatDateToday => 'Heute';
+
+  @override
+  String get chatDateYesterday => 'Gestern';
 }

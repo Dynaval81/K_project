@@ -58,7 +58,6 @@ class AiAssistantScreen extends StatelessWidget {
           message: message,
           isMe: message.isMe,
           isPreviousFromSameSender: isPreviousFromSame,
-          receiverBubbleColor: kAiBubbleColor,
         );
       },
     );

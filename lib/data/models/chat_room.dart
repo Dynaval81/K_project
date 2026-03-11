@@ -72,7 +72,8 @@ class ChatRoom {
       className:  map['className']?.toString(),
       lastMessage:     map['lastMessage']?.toString(),
       lastMessageTime: map['lastMessageTime'] != null
-          ? DateTime.tryParse(map['lastMessageTime'].toString())
+          ? (DateTime.tryParse(map['lastMessageTime'].toString())
+              ?? DateTime.fromMillisecondsSinceEpoch(0))
           : null,
     );
   }

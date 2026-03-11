@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:knoty/utils/emoji_text_controller.dart';
 
 /// HAI3 Molecule: Chat Input Field
 /// Send всегда виден. Emoji picker: вкладка SVG (emojis_v2) + GIF (emojis).
@@ -13,13 +14,14 @@ class ChatInputField extends StatefulWidget {
 }
 
 class _ChatInputFieldState extends State<ChatInputField> {
-  final _ctrl  = TextEditingController();
+  late final EmojiTextEditingController _ctrl;
   final _focus = FocusNode();
   bool _showEmoji = false;
 
   @override
   void initState() {
     super.initState();
+    _ctrl = EmojiTextEditingController();
     _focus.addListener(() {
       if (_focus.hasFocus && _showEmoji) {
         setState(() => _showEmoji = false);
@@ -106,12 +108,32 @@ class _ChatInputFieldState extends State<ChatInputField> {
               ),
               const SizedBox(width: 6),
 
-              // Text field with inline emoji overlay
+              // Text field — EmojiTextEditingController renders inline
               Expanded(
-                child: _EmojiAwareInput(
-                  controller: _ctrl,
-                  focusNode: _focus,
-                  onChanged: (_) => setState(() {}),
+                child: Container(
+                  constraints: const BoxConstraints(maxHeight: 120),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: TextField(
+                    controller: _ctrl,
+                    focusNode: _focus,
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: const TextStyle(
+                        fontSize: 16, color: Color(0xFF1A1A1A), height: 1.4),
+                    onChanged: (_) => setState(() {}),
+                    decoration: const InputDecoration(
+                      hintText: 'Nachricht...',
+                      hintStyle: TextStyle(
+                          fontSize: 16, color: Color(0xFFBDBDBD)),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
@@ -337,128 +359,6 @@ class _EmojiPickerState extends State<_EmojiPicker>
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// EmojiAwareInput — TextField + прозрачный оверлей с SVG/GIF иконками
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _EmojiAwareInput extends StatefulWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final ValueChanged<String> onChanged;
-
-  const _EmojiAwareInput({
-    required this.controller,
-    required this.focusNode,
-    required this.onChanged,
-  });
-
-  @override
-  State<_EmojiAwareInput> createState() => _EmojiAwareInputState();
-}
-
-class _EmojiAwareInputState extends State<_EmojiAwareInput> {
-  static final _emojiRe = RegExp(r'\[([^\]]+)\]');
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(() => setState(() {}));
-  }
-
-  // Строим spans для оверлея — текст прозрачный, эмодзи — картинки
-  List<InlineSpan> _buildOverlaySpans(String text) {
-    final spans = <InlineSpan>[];
-    int last = 0;
-    const textStyle = TextStyle(
-      fontSize: 16, color: Color(0xFF1A1A1A), height: 1.4);
-    for (final m in _emojiRe.allMatches(text)) {
-      if (m.start > last) {
-        // Обычный текст — видимый цвет
-        spans.add(TextSpan(
-          text: text.substring(last, m.start),
-          style: textStyle,
-        ));
-      }
-      final code = m.group(1)!;
-      final isSvg = code.startsWith('icon_');
-      spans.add(WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: isSvg
-            ? SvgPicture.asset('assets/emojis_v2/$code.svg',
-                width: 20, height: 20)
-            : Image.asset('assets/emojis/$code.gif',
-                width: 20, height: 20, gaplessPlayback: true),
-      ));
-      last = m.end;
-    }
-    if (last < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(last),
-        style: textStyle,
-      ));
-    }
-    return spans;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final text = widget.controller.text;
-    final hasEmoji = _emojiRe.hasMatch(text);
-
-    return Container(
-      constraints: const BoxConstraints(maxHeight: 120),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Stack(
-        alignment: Alignment.topLeft,
-        children: [
-          // Реальный TextField (всегда поверх для ввода)
-          TextField(
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            textCapitalization: TextCapitalization.sentences,
-            onChanged: widget.onChanged,
-            style: TextStyle(
-              fontSize: 16,
-              // Текст прозрачный только если есть эмодзи (оверлей их рисует)
-              color: hasEmoji
-                  ? Colors.transparent
-                  : const Color(0xFF1A1A1A),
-              height: 1.4,
-            ),
-            decoration: const InputDecoration(
-              hintText: 'Nachricht...',
-              hintStyle:
-                  TextStyle(fontSize: 16, color: Color(0xFFBDBDBD)),
-              border: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            ),
-          ),
-
-          // Оверлей с картинками эмодзи (только если есть коды)
-          if (hasEmoji)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10),
-                  child: Text.rich(
-                    TextSpan(children: _buildOverlaySpans(text)),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );

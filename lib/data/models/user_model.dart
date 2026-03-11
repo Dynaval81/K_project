@@ -167,6 +167,7 @@ class User {
     'lastName': lastName,
     'email': email,
     'knotyNumber': knotyNumber,
+    'role': role.name,
     'isPremium': isPremium,
     'premiumPlan': premiumPlan,
     'premiumExpiresAt': premiumExpiresAt?.toIso8601String(),
@@ -179,13 +180,37 @@ class User {
     'matrixUserId': matrixUserId,
     'createdAt': createdAt?.toIso8601String(),
     'verificationLevel': verificationLevel.name,
-    'school': school,
-    'schoolClass': schoolClass,
-    'role': role.name,
     'linkedAccounts': linkedAccounts,
-    'linkedChildId': linkedChildId,
-    'schoolId': schoolId,
+    // Данные регистрации — сгруппированы по роли для бэкенда
+    'registrationData': _registrationData(),
   };
+
+  /// Группирует поля регистрации по роли.
+  /// Бэкенд валидирует этот объект в зависимости от role.
+  Map<String, dynamic> _registrationData() {
+    switch (role) {
+      case UserRole.student:
+        return {
+          'school': school,
+          'schoolClass': schoolClass,
+          'schoolId': schoolId,
+        };
+      case UserRole.parent:
+        return {
+          'linkedChildId': linkedChildId,
+        };
+      case UserRole.teacher:
+        return {
+          'school': school,
+          'schoolId': schoolId,
+        };
+      case UserRole.schoolAdmin:
+      case UserRole.superAdmin:
+        return {
+          'schoolId': schoolId,
+        };
+    }
+  }
 
   User copyWith({
     String? id,

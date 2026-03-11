@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:knoty/core/constants.dart';
 import 'package:knoty/core/controllers/chat_controller.dart';
@@ -212,6 +213,26 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
+        // Аудиозвонок — заглушка, реализация после бэкенда
+        if (!chat.isGroup)
+          IconButton(
+            icon: const Icon(Icons.call_outlined,
+                color: Color(0xFF1A1A1A), size: 22),
+            onPressed: () => context.push('/call', extra: {
+              'name':  chat.name ?? '',
+              'isVideo': false,
+            }),
+          ),
+        // Видеозвонок — заглушка
+        if (!chat.isGroup)
+          IconButton(
+            icon: const Icon(Icons.videocam_outlined,
+                color: Color(0xFF1A1A1A), size: 22),
+            onPressed: () => context.push('/call', extra: {
+              'name':  chat.name ?? '',
+              'isVideo': true,
+            }),
+          ),
         IconButton(
           icon: const Icon(Icons.more_vert_rounded,
               color: Color(0xFF1A1A1A), size: 22),

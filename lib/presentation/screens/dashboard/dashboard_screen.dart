@@ -1,356 +1,134 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:knoty/constants/app_colors.dart';
 import 'package:knoty/core/constants/app_constants.dart';
 import 'package:knoty/core/controllers/auth_controller.dart';
 import 'package:knoty/core/controllers/tab_visibility_controller.dart';
-import 'package:knoty/core/enums/user_role.dart';
-import 'package:knoty/core/utils/app_logger.dart';
 import 'package:knoty/data/models/user_model.dart';
 import 'package:knoty/providers/user_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:knoty/core/utils/app_logger.dart';
+import 'package:knoty/theme_provider.dart';
 import 'package:knoty/l10n/app_localizations.dart';
-import 'package:knoty/presentation/widgets/knoty_app_bar.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final l10n     = AppLocalizations.of(context)!;
-    final auth     = context.watch<AuthController>();
-    final user     = auth.currentUser;
-    final role     = user?.role ?? UserRole.student;
-    final vis      = context.watch<TabVisibilityController>();
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: KnotyAppBar(title: l10n.dashboardTitle),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+class _DashboardScreenState extends State<DashboardScreen>
+    with AutomaticKeepAliveClientMixin {
+  bool _showAiTab = true;
+  bool _showChatsTab = true;
 
-            // ── User info card ───────────────────────────────────
-            _UserInfoCard(user: user, role: role),
-            const SizedBox(height: 16),
 
-            // ── Tab visibility — общие вкладки (у всех) ──────────
-            _ExpandCard(
-              icon: Icons.tune_rounded,
-              title: l10n.settingsTabsTitle,
-              initiallyExpanded: true,
-              children: [
-                _TabToggle(
-                  icon: Icons.chat_bubble_outline_rounded,
-                  label: l10n.settingsTabChats,
-                  value: vis.showChatsTab,
-                  onChanged: vis.setChatsTab,
-                  allValues: _baseTabValues(vis, role),
-                ),
-                _TabToggle(
-                  icon: Icons.psychology_rounded,
-                  label: l10n.settingsTabAi,
-                  value: vis.showAiTab,
-                  onChanged: vis.setAiTab,
-                  allValues: _baseTabValues(vis, role),
-                ),
-                _TabToggle(
-                  icon: Icons.school_rounded,
-                  label: l10n.settingsTabSchool,
-                  value: vis.showScheduleTab,
-                  onChanged: vis.setScheduleTab,
-                  allValues: _baseTabValues(vis, role),
-                ),
-                // Role-specific toggles
-                if (role.hasChildTab)
-                  _TabToggle(
-                    icon: Icons.child_care_rounded,
-                    label: l10n.settingsTabKind,
-                    value: vis.showKindTab,
-                    onChanged: vis.setKindTab,
-                    allValues: _baseTabValues(vis, role),
-                  ),
-                if (role.hasMyClassesTab)
-                  _TabToggle(
-                    icon: Icons.class_rounded,
-                    label: l10n.settingsTabClasses,
-                    value: vis.showClassesTab,
-                    onChanged: vis.setClassesTab,
-                    allValues: _baseTabValues(vis, role),
-                  ),
-                if (role.hasManagementTab)
-                  _TabToggle(
-                    icon: Icons.admin_panel_settings_rounded,
-                    label: l10n.settingsTabVerwaltung,
-                    value: vis.showVerwaltungTab,
-                    onChanged: vis.setVerwaltungTab,
-                    allValues: _baseTabValues(vis, role),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 4),
+  @override
+  bool get wantKeepAlive => true;
 
-            // ── App info ─────────────────────────────────────────
-            _ExpandCard(
-              icon: Icons.info_outline_rounded,
-              title: l10n.dashboardAppInfo,
-              children: [
-                _InfoRow('App', 'Knoty'),
-                _InfoRow('Version', '1.0.0 (1)'),
-                _InfoRow('Build', '1'),
-                _InfoRow('API', 'v1.0'),
-              ],
-            ),
+  @override
+  void initState() {
+    super.initState();
+    _loadTabVisibility();
+  }
 
-            // ── Bug report ───────────────────────────────────────
-            _ReportButton(user: user),
-            const SizedBox(height: 8),
+  void _loadTabVisibility() {
+    // State is owned by TabVisibilityController — no duplicate local prefs
+    final ctrl = context.read<TabVisibilityController>();
+    setState(() {
+      _showChatsTab = ctrl.showChatsTab;
+      _showAiTab    = ctrl.showAiTab;
+    });
+  }
 
-            // ── Logout ───────────────────────────────────────────
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  await context.read<AuthController>().logout();
-                  if (context.mounted) context.go(AppRoutes.auth);
-                },
-                icon: const Icon(Icons.logout_rounded, size: 18),
-                label: Text(l10n.dashboardLogout),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                ),
-              ),
-            ),
-          ],
-          ),  // Column
-        ),
-      ),
+  void _saveTabVisibility() {
+    final ctrl = context.read<TabVisibilityController>();
+    ctrl.setShowChatsTab(_showChatsTab);
+    ctrl.setShowAiTab(_showAiTab);
+  }
+
+  void _showProfileOverlay() {
+    // Читаем user здесь — в корректном контексте с провайдерами
+    final user = context.read<AuthController>().currentUser ??
+        context.read<UserProvider>().user;
+    final themeProvider = context.read<ThemeProvider>();
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'profile',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (_, __, ___) => const SizedBox.shrink(),
+      transitionBuilder: (ctx, anim, _, __) {
+        final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+        return FadeTransition(
+          opacity: curved,
+          child: _ProfileOverlay(user: user, themeProvider: themeProvider),
+        );
+      },
     );
   }
 
-  /// Все значения базовых вкладок + роль-специфичных — для защиты от отключения последней
-  List<bool> _baseTabValues(TabVisibilityController vis, UserRole role) {
-    return [
-      vis.showChatsTab,
-      vis.showAiTab,
-      vis.showScheduleTab,
-      if (role.hasChildTab)    vis.showKindTab,
-      if (role.hasMyClassesTab) vis.showClassesTab,
-      if (role.hasManagementTab) vis.showVerwaltungTab,
-    ];
-  }
-}
-
-// ── User info card ────────────────────────────────────────────────────────────
-
-class _UserInfoCard extends StatelessWidget {
-  final User? user;
-  final UserRole role;
-  const _UserInfoCard({required this.user, required this.role});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildCard({
+    required IconData icon,
+    required String title,
+    required List<Widget> children,
+    bool initiallyExpanded = false,
+  }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
-      ),
-      child: Row(children: [
-        // Avatar circle
-        Container(
-          width: 52, height: 52,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [Color(0xFFE6B800), Color(0xFFFFD84D)],
-              begin: Alignment.topLeft, end: Alignment.bottomRight,
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
-          child: Center(child: Text(
-            (user?.username ?? '?').substring(0, 1).toUpperCase(),
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white),
-          )),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(user?.username ?? '–',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1A1A1A)),
-            overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 2),
-          Text(user?.email ?? '–',
-            style: const TextStyle(fontSize: 14, color: Color(0xFF9E9E9E)),
-            overflow: TextOverflow.ellipsis),
-        ])),
-        // Role badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF8E1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(role.displayName,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFE6B800))),
-        ),
-      ]),
-    );
-  }
-}
-
-// ── Expand card ───────────────────────────────────────────────────────────────
-
-class _ExpandCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final List<Widget> children;
-  final bool initiallyExpanded;
-
-  const _ExpandCard({
-    required this.icon,
-    required this.title,
-    required this.children,
-    this.initiallyExpanded = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
+        ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: ExpansionTile(
-          key: PageStorageKey<String>(title),
-          initiallyExpanded: initiallyExpanded,
-          shape: const Border(),
-          backgroundColor: Colors.transparent,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-          leading: Icon(icon, color: const Color(0xFFE6B800), size: 24),
-          title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
-          children: children,
-        ),
+      child: ExpansionTile(
+        key: PageStorageKey<String>(title),
+        initiallyExpanded: initiallyExpanded,
+        shape: const Border(),
+        backgroundColor: Colors.transparent,
+        tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        leading: Icon(icon, color: AppColors.primaryBlue, size: 24),
+        title: Text(title,
+            style: const TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
+        children: children,
       ),
     );
   }
-}
 
-// ── Tab toggle ────────────────────────────────────────────────────────────────
-
-class _TabToggle extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final List<bool> allValues; // защита от отключения последней вкладки
-
-  const _TabToggle({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.onChanged,
-    required this.allValues,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final enabledCount = allValues.where((v) => v).length;
-    final isLast = value && enabledCount <= 1;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(children: [
-        Container(
-          width: 34, height: 34,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE6B800).withOpacity(0.10),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: const Color(0xFFE6B800), size: 17),
-        ),
-        const SizedBox(width: 12),
-        Expanded(child: Text(label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87))),
-        Switch.adaptive(
-          value: value,
-          onChanged: isLast ? null : onChanged,
-          activeColor: const Color(0xFFE6B800),
-        ),
-      ]),
-    );
-  }
-}
-
-// ── Info row ──────────────────────────────────────────────────────────────────
-
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-  const _InfoRow(this.label, this.value);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _infoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(label, style: const TextStyle(fontSize: 16, color: Colors.grey)),
-        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
-      ]),
-    );
-  }
-}
-
-// ── Bug report button ─────────────────────────────────────────────────────────
-
-class _ReportButton extends StatelessWidget {
-  final User? user;
-  const _ReportButton({required this.user});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: () => _showSheet(context),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
-        ),
-        child: Row(children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(color: Colors.red.withOpacity(0.08), borderRadius: BorderRadius.circular(12)),
-            child: const Icon(Icons.bug_report_outlined, color: Colors.redAccent, size: 22),
-          ),
-          const SizedBox(width: 14),
-          Expanded(child: Text(l10n.dashboardReport,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87))),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.black26),
-        ]),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 16, color: Colors.grey)),
+          Text(value,
+              style: const TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+        ],
       ),
     );
   }
 
-  void _showSheet(BuildContext context) {
-    final up   = context.read<UserProvider>();
+  void _showReportSheet(BuildContext context) {
     final auth = context.read<AuthController>();
+    final up = context.read<UserProvider>();
     final user = auth.currentUser ?? up.user;
 
     showModalBottomSheet(
@@ -358,51 +136,587 @@ class _ReportButton extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (_) => _ReportSheet(onSend: (text) => _send(user, text)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetCtx) => _ReportSheet(
+        onSend: (text) => _sendReport(user, text),
+      ),
     );
   }
 
-  Future<void> _send(User? user, String text) async {
+  Future<void> _sendReport(User? user, String text) async {
     if (text.isEmpty) return;
+
     try {
       final token = await const FlutterSecureStorage().read(key: 'auth_token');
+      final now = DateTime.now().toIso8601String();
+
       final body = {
         'description': text,
         'appVersion': '1.0.0',
         'platform': 'android',
-        'logs': '=== USER ===\nuser=${user?.username ?? "unknown"}\n'
+        'logs': '=== USER INFO ===\n'
+            'user=${user?.username ?? "unknown"}\n'
             'email=${user?.email ?? "unknown"}\n'
-            'kn=${user?.knotyNumber ?? ""}\n'
-            '=== LOGS ===\n${AppLogger.instance.getLogs()}',
+            'vt=VT-${user?.knotyNumber ?? ""}\n'
+            'vpn=${user?.hasVpnAccess ?? false}\n'
+            'premium=${user?.isPremium ?? false}\n'
+            'timestamp=$now\n'
+            '=== APP LOGS ===\n'
+            '${AppLogger.instance.getLogs()}',
       };
-      await http.post(
+
+      final response = await http.post(
         Uri.parse('https://hypermax.duckdns.org/api/v1/bug-report'),
-        headers: {'Content-Type': 'application/json', if (token != null) 'Authorization': 'Bearer $token'},
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
         body: jsonEncode(body),
       ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        debugPrint('[REPORT] Failed: ${response.statusCode}');
+      }
     } catch (e) {
-      debugPrint('[REPORT] $e');
+      debugPrint('[REPORT] Error: $e');
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Scaffold(
+      backgroundColor: Colors.white,
+      restorationId: 'dashboard_scaffold',
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(AppLocalizations.of(context)!.dashboardTitle,
+                      style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black)),
+                  GestureDetector(
+                    onTap: _showProfileOverlay,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryBlue.withOpacity(0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.person_outline_rounded,
+                          color: AppColors.primaryBlue, size: 22),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              _buildCard(
+                icon: Icons.tune_rounded,
+                title: AppLocalizations.of(context)!.dashboardElementsStore,
+                initiallyExpanded: true,
+                children: [
+                  SwitchListTile(
+                    value: _showChatsTab,
+                    onChanged: (v) { setState(() => _showChatsTab = v); _saveTabVisibility(); },
+                    title: Text(AppLocalizations.of(context)!.dashboardTabChats,
+                        style: const TextStyle(fontSize: 16, color: Colors.black)),
+                    activeColor: AppColors.primaryBlue,
+                  ),
+                  SwitchListTile(
+                    value: _showAiTab,
+                    onChanged: (v) { setState(() => _showAiTab = v); _saveTabVisibility(); },
+                    title: Text(AppLocalizations.of(context)!.dashboardTabAi,
+                        style: const TextStyle(fontSize: 16, color: Colors.black)),
+                    activeColor: AppColors.primaryBlue,
+                  ),
+                ],
+              ),
+
+              _buildCard(
+                icon: Icons.info_outline_rounded,
+                title: AppLocalizations.of(context)!.dashboardAppInfo,
+                children: [
+                  _infoRow('App', 'V-Talk'),
+                  _infoRow('Version', '1.0.0 (1)'),
+                ],
+              ),
+
+              _buildCard(
+                icon: Icons.favorite_outline_rounded,
+                title: AppLocalizations.of(context)!.dashboardDonations,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      AppLocalizations.of(context)!.dashboardDonationsText,
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
+
+              _buildCard(
+                icon: Icons.memory_rounded,
+                title: AppLocalizations.of(context)!.dashboardVersionDetails,
+                children: [
+                  _infoRow('Build', '1'),
+                  _infoRow('API', 'v1.0'),
+                ],
+              ),
+
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: GestureDetector(
+                  onTap: () => _showReportSheet(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.bug_report_outlined,
+                              color: Colors.redAccent, size: 22),
+                        ),
+                        const SizedBox(width: 14),
+                        const Expanded(
+                          child: Text(
+                            'Сообщить об ошибке',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios_rounded,
+                            size: 14, color: Colors.black26),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
-// ── Report sheet ──────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Profile Overlay
+// ─────────────────────────────────────────────────────────────────────────────
+class _ProfileOverlay extends StatelessWidget {
+  final User? user;
+  final ThemeProvider themeProvider;
 
+  const _ProfileOverlay({this.user, required this.themeProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Blur backdrop
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(color: Colors.black.withOpacity(0.25)),
+            ),
+          ),
+        ),
+
+        // Card
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 60,
+          right: 16,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: 300,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 30,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Avatar + info ─────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                    child: Row(
+                      children: [
+                        // Avatar (только отображение — загрузки нет)
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryBlue.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: user?.avatar != null
+                              ? ClipOval(
+                                  child: Image.network(
+                                    user!.avatar!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        _GradientAvatar(user!.username),
+                                  ),
+                                )
+                              : _GradientAvatar(user?.username ?? '?'),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '@${user?.username ?? '—'}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              if (user?.email.isNotEmpty == true) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  user!.email,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade500),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                              if (user?.knotyNumber.isNotEmpty == true) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  // Backend returns vtNumber with or without VT- prefix
+                                  user!.knotyNumber.startsWith('KN-')
+                                      ? user!.knotyNumber
+                                      : 'KN-${user!.knotyNumber}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.primaryBlue,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ── Access badges ─────────────────────────────
+                  if (user != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: [
+                          if (user!.isPremium)
+                            _Badge(
+                                label: 'Premium',
+                                icon: Icons.star_rounded,
+                                colors: [Color(0xFFFFB800), Color(0xFFFF6B00)]),
+                          if (user!.canUseVpn)
+                            _Badge(
+                                label: 'VPN',
+                                icon: Icons.vpn_lock_rounded,
+                                colors: [Color(0xFF2196F3), Color(0xFF0D47A1)]),
+                          if (user!.canUseAi)
+                            _Badge(
+                                label: 'AI',
+                                icon: Icons.psychology_rounded,
+                                colors: [Color(0xFF9C27B0), Color(0xFF4A148C)]),
+                        ],
+                      ),
+                    ),
+
+                  const Divider(height: 1),
+
+                  // ── Theme switcher ────────────────────────────
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    child: Row(
+                      children: [
+                        Icon(Icons.palette_outlined,
+                            size: 18, color: Colors.grey.shade600),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text('Тема',
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.black87)),
+                        ),
+                        _ThemeToggle(provider: themeProvider),
+                      ],
+                    ),
+                  ),
+
+                  const Divider(height: 1),
+
+                  // ── Settings ──────────────────────────────────
+                  ListTile(
+                    dense: true,
+                    leading: Icon(Icons.settings_outlined,
+                        size: 18, color: Colors.grey.shade600),
+                    title: const Text('Настройки',
+                        style: TextStyle(fontSize: 14)),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.settings);
+                    },
+                  ),
+
+                  // ── Профиль
+                  ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.badge_outlined, size: 18, color: Color(0xFFE6B800)),
+                    title: const Text('Mein Profil & KN-Nummer', style: TextStyle(fontSize: 14)),
+                    trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: Colors.grey),
+                    onTap: () { Navigator.of(context).pop(); context.push('/profile'); },
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+
+                  // ── Logout ────────────────────────────────────
+                  ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.logout_rounded,
+                        size: 18, color: Colors.redAccent),
+                    title: const Text('Выйти',
+                        style:
+                            TextStyle(fontSize: 14, color: Colors.redAccent)),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await context.read<AuthController>().logout();
+                      if (context.mounted) context.go(AppRoutes.auth);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Badge
+// ─────────────────────────────────────────────────────────────────────────────
+class _Badge extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final List<Color> colors;
+
+  const _Badge({required this.label, required this.icon, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: colors),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 12),
+          const SizedBox(width: 4),
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Theme Toggle
+// ─────────────────────────────────────────────────────────────────────────────
+class _ThemeToggle extends StatefulWidget {
+  final ThemeProvider provider;
+  const _ThemeToggle({required this.provider});
+
+  @override
+  State<_ThemeToggle> createState() => _ThemeToggleState();
+}
+
+class _ThemeToggleState extends State<_ThemeToggle> {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = widget.provider.isDarkMode;
+    return Container(
+      height: 28,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F3F5),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _Btn(
+            icon: Icons.light_mode_rounded,
+            active: !isDark,
+            onTap: () { widget.provider.setTheme(false); setState(() {}); },
+          ),
+          _Btn(
+            icon: Icons.dark_mode_rounded,
+            active: isDark,
+            onTap: () { widget.provider.setTheme(true); setState(() {}); },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Btn extends StatelessWidget {
+  final IconData icon;
+  final bool active;
+  final VoidCallback onTap;
+  const _Btn({required this.icon, required this.active, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 32,
+        height: 28,
+        decoration: BoxDecoration(
+          color: active ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: active
+              ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)]
+              : null,
+        ),
+        child: Icon(icon,
+            size: 16,
+            color: active ? AppColors.primaryBlue : Colors.grey.shade500),
+      ),
+    );
+  }
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Gradient Avatar — первая буква ника на градиентном фоне
+// ─────────────────────────────────────────────────────────────────────────────
+class _GradientAvatar extends StatelessWidget {
+  final String name;
+  const _GradientAvatar(this.name);
+
+  // Детерминированный цвет по первой букве
+  static const _palettes = [
+    [Color(0xFF2196F3), Color(0xFF0D47A1)], // blue
+    [Color(0xFF9C27B0), Color(0xFF4A148C)], // purple
+    [Color(0xFF00BCD4), Color(0xFF006064)], // cyan
+    [Color(0xFF4CAF50), Color(0xFF1B5E20)], // green
+    [Color(0xFFFF9800), Color(0xFFE65100)], // orange
+    [Color(0xFFE91E63), Color(0xFF880E4F)], // pink
+  ];
+
+  List<Color> get _colors {
+    if (name.isEmpty) return _palettes[0];
+    return _palettes[name.codeUnitAt(0) % _palettes.length];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final letter = name.isNotEmpty ? name[0].toUpperCase() : '?';
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: _colors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          letter,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Report Sheet
+// ─────────────────────────────────────────────────────────────────────────────
 class _ReportSheet extends StatefulWidget {
   final Future<void> Function(String text) onSend;
   const _ReportSheet({required this.onSend});
+
   @override
   State<_ReportSheet> createState() => _ReportSheetState();
 }
 
 class _ReportSheetState extends State<_ReportSheet> {
-  final _ctrl = TextEditingController();
+  final TextEditingController _ctrl = TextEditingController();
   bool _sending = false;
-  bool _sent    = false;
+  bool _sent = false;
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   Future<void> _submit() async {
     final text = _ctrl.text.trim();
@@ -417,58 +731,93 @@ class _ReportSheetState extends State<_ReportSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n   = AppLocalizations.of(context)!;
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottom),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Center(child: Container(width: 40, height: 4,
-          decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(2)))),
-        const SizedBox(height: 20),
-        Text(l10n.dashboardReport, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
-        Text(l10n.dashboardReportHint, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-        const SizedBox(height: 16),
-        if (_sent)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Row(children: [
-              Icon(Icons.check_circle, color: Colors.green),
-              SizedBox(width: 8),
-              Text('Bericht gesendet', style: TextStyle(color: Colors.green, fontSize: 15)),
-            ]),
-          )
-        else ...[
-          Container(
-            decoration: BoxDecoration(color: const Color(0xFFF1F3F5), borderRadius: BorderRadius.circular(16)),
-            child: TextField(
-              controller: _ctrl, maxLines: 5, autofocus: true,
-              style: const TextStyle(fontSize: 15, color: Colors.black87),
-              decoration: const InputDecoration(
-                hintText: 'Was ist passiert?',
-                hintStyle: TextStyle(color: Colors.black38, fontSize: 14),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.all(14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40, height: 4,
+              decoration: BoxDecoration(
+                color: Colors.black12,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            AppLocalizations.of(context)!.dashboardReport,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            AppLocalizations.of(context)!.dashboardReportHint,
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
           ),
           const SizedBox(height: 16),
-          SizedBox(width: double.infinity, height: 52,
-            child: ElevatedButton(
-              onPressed: _sending ? null : _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE6B800), foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          if (_sent)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green),
+                  SizedBox(width: 8),
+                  Text(AppLocalizations.of(context)!.dashboardReportSent,
+                      style: const TextStyle(color: Colors.green, fontSize: 15)),
+                ],
               ),
-              child: _sending
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Text('Senden', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            )
+          else ...[
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F3F5),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: TextField(
+                controller: _ctrl,
+                maxLines: 5,
+                autofocus: true,
+                style: const TextStyle(fontSize: 15, color: Colors.black87),
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.dashboardReportPlaceholder,
+                  hintStyle: TextStyle(color: Colors.black38, fontSize: 14),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(14),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _sending ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryBlue,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: _sending
+                    ? const SizedBox(
+                        width: 20, height: 20,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2),
+                      )
+                    : Text(AppLocalizations.of(context)!.dashboardReportSend,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 16)),
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
         ],
-        const SizedBox(height: 8),
-      ]),
+      ),
     );
   }
 }

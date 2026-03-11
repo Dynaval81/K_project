@@ -38,7 +38,7 @@ class ChatController extends ChangeNotifier {
       _chats     = _chatRooms.map((r) => ChatModel.fromChatRoom(r)).toList();
     } catch (e, stack) {
       _error = 'Fehler beim Laden';
-      debugPrint('[Chat] loadChats error: $e\n$stack');
+      debugPrint('[Chat] loadChats error: ' + e.toString());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -105,8 +105,7 @@ class ChatController extends ChangeNotifier {
       final i = _messages.indexWhere((m) => m.id == newMessage.id);
       if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.failed);
       _error = 'Fehler beim Senden';
-      debugPrint('[Chat] sendMessage error: $e
-$stack');
+      debugPrint('[Chat] sendMessage error: ' + e.toString() + ' ' + stack.toString());
     }
     notifyListeners();
   }

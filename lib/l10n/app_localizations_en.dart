@@ -232,37 +232,134 @@ class AppLocalizationsEn extends AppLocalizations {
   String get curfewMessage => 'The app is locked until tomorrow morning.';
 
   @override
+  String get loginPrimaryButton => 'Log in';
+
+  @override
+  String get chatUnknown => 'Unknown';
+
+  @override
+  String get chatTypeClass => 'Class group';
+
+  @override
+  String get chatTypeSchool => 'School group';
+
+  @override
+  String get chatOnline => 'Online';
+
+  @override
+  String get chatLastSeen => 'Last seen recently';
+
+  @override
+  String get chatNoMessages => 'No messages yet';
+
+  @override
+  String get chatFirstMessage => 'Be the first to write!';
+
+  @override
+  String get chatNewMessages => 'New messages';
+
+  @override
+  String get chatDateToday => 'Today';
+
+  @override
+  String get chatDateYesterday => 'Yesterday';
+
+  @override
+  String get settingsTabsTitle => 'Tabs';
+
+  @override
+  String get settingsTabChats => 'Chats';
+
+  @override
+  String get settingsTabAi => 'AI Assistant';
+
+  @override
+  String get settingsTabSchool => 'School';
+
+  @override
+  String get settingsTabKind => 'Child';
+
+  @override
+  String get settingsTabClasses => 'Classes';
+
+  @override
+  String get settingsTabVerwaltung => 'Administration';
+
+  @override
+  String get splashHai3Label => 'HAI3 Design';
+
+  @override
+  String get dashboardDonationsText =>
+      'Help us keep Knoty free and independent.';
+
+  @override
+  String get dashboardDonations => 'Support Knoty';
+
+  @override
+  String get dashboardElementsStore => 'Store';
+
+  @override
+  String get dashboardReportPlaceholder => 'Describe the issue...';
+
+  @override
+  String get dashboardReportSend => 'Send';
+
+  @override
+  String get dashboardReportSent => 'Report sent. Thank you!';
+
+  @override
+  String get dashboardTabAi => 'AI Assistant';
+
+  @override
+  String get dashboardTabChats => 'Chats';
+
+  @override
+  String get dashboardTabVpn => 'VPN';
+
+  @override
   String get schoolTitle => 'School';
 
   @override
-  String get schoolNotVerifiedTitle => 'School not confirmed yet';
+  String get schoolCodeEmpty => 'Please enter a school code';
+
+  @override
+  String get schoolCodeInvalid => 'Invalid school code';
+
+  @override
+  String get schoolNotVerifiedTitle => 'Not yet verified';
 
   @override
   String get schoolNotVerifiedSubtitle =>
-      'Enter your school code or wait for confirmation from your school.';
+      'Your account is waiting for school admin confirmation.';
 
   @override
   String get schoolCodeHint => 'SCH-XXXX';
 
   @override
-  String get schoolCodeRedeem => 'Redeem Code';
+  String get schoolCodeRedeem => 'Redeem code';
 
   @override
-  String get schoolCodeInvalid => 'Invalid code. Please check and try again.';
-
-  @override
-  String get schoolCodeEmpty => 'Please enter school code';
-
-  @override
-  String get schoolWaitingConfirmation => 'Waiting for school confirmation';
-
-  @override
-  String schoolWaitingFrom(String school) {
-    return 'Waiting for confirmation from\n$school';
+  String schoolWaitingFrom(Object school) {
+    return 'Waiting for confirmation from $school';
   }
 
   @override
-  String get schoolServicesTitle => 'Services';
+  String get schoolWaitingConfirmation => 'Waiting for confirmation';
+
+  @override
+  String get schoolStatClass => 'Class';
+
+  @override
+  String get schoolStatStatus => 'Status';
+
+  @override
+  String get schoolStatActive => 'Active';
+
+  @override
+  String get schoolStatNew => 'New';
+
+  @override
+  String get schoolServicesTitle => 'School services';
 
   @override
   String get schoolTimetable => 'Timetable';
@@ -283,145 +380,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get schoolEvents => 'Events';
 
   @override
-  String get schoolUpcomingTitle => 'Upcoming Events';
+  String get schoolUpcomingTitle => 'Upcoming';
 
   @override
-  String get schoolStatClass => 'Class';
-
-  @override
-  String get schoolStatStatus => 'Status';
-
-  @override
-  String get schoolStatNew => 'New';
-
-  @override
-  String get schoolStatActive => 'Active';
+  String schoolComingSoon(Object name) {
+    return '$name coming soon';
+  }
 
   @override
   String get schoolVerifiedBadge => 'Verified';
 
   @override
-  String schoolComingSoon(String name) {
-    return '$name — coming soon';
-  }
-
-  @override
-  String get settingsTabsTitle => 'Visible Tabs';
-
-  @override
-  String get settingsTabChats => 'Chats';
-
-  @override
-  String get settingsTabAi => 'AI Assistant';
-
-  @override
-  String get settingsTabSchool => 'School';
-
-  @override
-  String get settingsTabKind => 'Child';
-
-  @override
-  String get lockedDefaultTitle => 'Locked';
-
-  @override
-  String get lockedDefaultSubtitle => 'Waiting for administrator approval.';
-
-  @override
-  String get lockedSchoolChatsTitle => 'School Chats Locked';
-
-  @override
-  String get lockedSchoolChatsSubtitle =>
-      'Waiting for approval from your school administrator.';
+  String get parentTitle => 'Child';
 
   @override
   String get lockedNoChildTitle => 'No child linked';
 
   @override
   String get lockedNoChildSubtitle =>
-      'Link your account with your child\'s KN code in settings.';
-
-  @override
-  String get lockedTeacherTitle => 'Access Restricted';
-
-  @override
-  String get lockedTeacherSubtitle =>
-      'Waiting for verification by your school administrator.';
-
-  @override
-  String get verwaltungTitle => 'Administration';
-
-  @override
-  String get verwaltungActivateUsers => 'Activate Users';
-
-  @override
-  String get verwaltungActivateUsersSubtitle =>
-      'Approve students, teachers and parents';
-
-  @override
-  String get verwaltungGenerateCodes => 'Generate School Codes';
-
-  @override
-  String get verwaltungGenerateCodesSubtitle =>
-      'SCH-XXXX codes for registration';
-
-  @override
-  String get verwaltungUserList => 'User List';
-
-  @override
-  String get verwaltungUserListSubtitle => 'Manage all school members';
-
-  @override
-  String get verwaltungSuperAdminHint =>
-      'Full administration available via the web panel.';
-
-  @override
-  String get parentTitle => 'Child';
+      'Enter your child\'s KN number to link accounts.';
 
   @override
   String get teacherClassesTitle => 'My Classes';
 
   @override
-  String get teacherClassesComingSoon => 'Class area — coming soon';
+  String get lockedTeacherTitle => 'Not yet available';
 
   @override
-  String get loginPrimaryButton => 'Continue';
+  String get lockedTeacherSubtitle =>
+      'Classes management available after school verification.';
 
   @override
-  String get splashHai3Label => 'Educational Messenger';
+  String get teacherClassesComingSoon => 'Classes coming soon';
 
   @override
-  String get settingsTabClasses => 'My Classes';
+  String get verwaltungTitle => 'Administration';
 
   @override
-  String get settingsTabVerwaltung => 'Administration';
+  String get verwaltungActivateUsers => 'Activate users';
 
   @override
-  String get chatTypeClass => 'Class group';
+  String get verwaltungActivateUsersSubtitle =>
+      'Review and activate pending registrations';
 
   @override
-  String get chatTypeSchool => 'School group';
+  String get verwaltungGenerateCodes => 'Generate codes';
 
   @override
-  String get chatOnline => 'Online';
+  String get verwaltungGenerateCodesSubtitle => 'Create school access codes';
 
   @override
-  String get chatLastSeen => 'Last seen';
+  String get verwaltungUserList => 'User list';
 
   @override
-  String get chatUnknown => 'Unknown';
+  String get verwaltungUserListSubtitle => 'View and manage all school users';
 
   @override
-  String get chatNoMessages => 'No messages yet';
+  String get verwaltungSuperAdminHint =>
+      'You have superadmin access to all schools.';
 
   @override
-  String get chatFirstMessage => 'Write the first message!';
+  String get lockedDefaultTitle => 'Feature locked';
 
   @override
-  String get chatNewMessages => 'New messages';
-
-  @override
-  String get chatDateToday => 'Today';
-
-  @override
-  String get chatDateYesterday => 'Yesterday';
+  String get lockedDefaultSubtitle =>
+      'This feature is not available for your account.';
 }

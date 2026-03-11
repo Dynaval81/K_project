@@ -14,6 +14,8 @@ import 'package:knoty/presentation/screens/auth/registration_success_screen.dart
 import 'package:knoty/presentation/screens/auth/email_verification_screen.dart';
 import 'package:knoty/presentation/screens/chat/chat_room_screen.dart';
 import 'package:knoty/presentation/screens/settings_screen.dart';
+import 'package:knoty/presentation/screens/profile/profile_screen.dart';
+import 'package:knoty/presentation/screens/call/call_screen.dart';
 import 'package:knoty/presentation/screens/splash_screen.dart';
 import 'package:knoty/presentation/widgets/airy_button.dart';
 import 'package:knoty/presentation/widgets/organisms/main_nav_shell.dart';
@@ -126,6 +128,21 @@ class _KnotyAppState extends State<KnotyApp> {
         GoRoute(
           path: AppRoutes.settings,
           pageBuilder: (context, state) => const CupertinoPage<void>(child: SettingsScreen()),
+        ),
+        GoRoute(
+          path: '/profile',
+          pageBuilder: (context, state) => const CupertinoPage<void>(child: ProfileScreen()),
+        ),
+        GoRoute(
+          path: '/call',
+          pageBuilder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>? ?? {};
+            return CupertinoPage<void>(child: CallScreen(
+              contactName:   extra['name']?.toString()   ?? '',
+              contactAvatar: extra['avatar']?.toString(),
+              isVideo:       extra['isVideo'] == true,
+            ));
+          },
         ),
       ],
       errorBuilder: (context, state) => _ErrorScreen(error: state.error),

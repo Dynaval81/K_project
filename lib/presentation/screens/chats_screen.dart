@@ -375,7 +375,9 @@ class _Avatar extends StatelessWidget {
     final index = id.hashCode.abs() % colors.length;
     return colors[index];
   }
-/// Converts [icon_name] codes in chat preview to readable emoji
+}
+
+/// Converts [icon_name] emoji codes to readable preview text
 String _emojiPreview(String? text) {
   if (text == null || text.isEmpty) return '';
   final cleaned = text.replaceAllMapped(
@@ -383,6 +385,4 @@ String _emojiPreview(String? text) {
     (m) => m.group(1)!.startsWith('icon_') ? '🙂' : '🖼',
   ).trim();
   return cleaned.isEmpty ? '🙂' : cleaned;
-}
-
 }

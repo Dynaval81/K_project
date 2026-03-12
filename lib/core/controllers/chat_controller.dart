@@ -1,149 +1,210 @@
-import 'dart:math' show Random;
-import 'package:flutter/foundation.dart';
-import 'package:knoty/core/services/chat_service.dart';
-import 'package:knoty/data/models/chat_model.dart';
+// v1.2.0
+import 'package:flutter/material.dart';
 import 'package:knoty/data/models/chat_room.dart';
 import 'package:knoty/data/models/message_model.dart';
-import 'package:knoty/logic/chat_manager.dart';
 
-/// Single chat state controller (Provider-only).
 class ChatController extends ChangeNotifier {
-  ChatController() {
-    _chatRooms = List.from(ChatManager.chats);
-    _messages  = List.from(ChatManager.messages);
-    _chats     = _chatRooms.map((r) => ChatModel.fromChatRoom(r)).toList();
+  List<ChatRoom> _chatRooms = [];
+  List<MessageModel> _messages = [];
+  bool _isLoading = false;
+  String? _matrixUserId;
+
+  // messageId → emoji code (хранится здесь, а не в State виджета)
+  final Map<String, String> _reactions = {};
+
+  List<ChatRoom> get chatRooms => _chatRooms;
+  List<MessageModel> get messages => _messages;
+  bool get isLoading => _isLoading;
+
+  /// Возвращает реакцию на сообщение или null
+  String? reactionFor(String messageId) => _reactions[messageId];
+
+  /// Устанавливает реакцию. Повторный тап на ту же — снимает.
+  void setReaction(String messageId, String emojiCode) {
+    if (_reactions[messageId] == emojiCode) {
+      _reactions.remove(messageId);
+    } else {
+      _reactions[messageId] = emojiCode;
+    }
+    notifyListeners();
   }
 
-  final ChatService _chatService = ChatService();
-  List<ChatRoom>    _chatRooms   = [];
-  List<MessageModel> _messages   = [];
-  List<ChatModel>   _chats       = [];
-  bool   _isLoading = false;
-  String? _error;
+  List<ChatRoom> get personalRooms => _chatRooms.where((r) => r.isPersonal).toList();
+  List<ChatRoom> get groupRooms => _chatRooms.where((r) => r.isGroup).toList();
 
-  List<ChatRoom>    get chatRooms => List.unmodifiable(_chatRooms);
-  List<MessageModel> get messages => List.unmodifiable(_messages);
-  bool   get isLoading => _isLoading;
-  String? get error    => _error;
-  List<ChatModel> get chats => List.unmodifiable(_chats);
+  void updateUserId(String? userId) {
+    _matrixUserId = userId;
+    debugPrint('ChatController: User ID updated to $userId');
+    loadChatRooms();
+    notifyListeners();
+  }
 
   Future<void> loadChatRooms() async {
     _isLoading = true;
-    _error = null;
     notifyListeners();
-    try {
-      await Future.delayed(const Duration(milliseconds: 300));
-      _chatRooms = List.from(ChatManager.chats);
-      _messages  = List.from(ChatManager.messages);
-      _chats     = _chatRooms.map((r) => ChatModel.fromChatRoom(r)).toList();
-    } catch (e, stack) {
-      _error = 'Fehler beim Laden';
-      debugPrint('[Chat] loadChats error: $e\n$stack');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Mock chat rooms
+    _chatRooms = [
+      ChatRoom(
+        id: 'group_10b',
+        name: 'Klasse 10B',
+        isGroup: true,
+        isClassGroup: true,
+        isOnline: true,
+        unread: 5,
+        lastMessage: 'Hausaufgabe für alle!',
+        lastActivity: DateTime.now().subtract(const Duration(minutes: 10)),
+      ),
+      ChatRoom(
+        id: 'personal_anna',
+        name: 'Anna Müller',
+        isGroup: false,
+        isOnline: true,
+        unread: 2,
+        lastMessage: 'Kannst du mir helfen?',
+        lastActivity: DateTime.now().subtract(const Duration(minutes: 30)),
+      ),
+      ChatRoom(
+        id: 'personal_max',
+        name: 'Max Schmidt',
+        isGroup: false,
+        isOnline: false,
+        unread: 0,
+        lastMessage: 'Bis morgen!',
+        lastActivity: DateTime.now().subtract(const Duration(hours: 2)),
+      ),
+      ChatRoom(
+        id: 'personal_lehrer',
+        name: 'Hr. Weber',
+        isGroup: false,
+        isOnline: true,
+        unread: 1,
+        lastMessage: 'Bitte pünktlich sein.',
+        lastActivity: DateTime.now().subtract(const Duration(hours: 5)),
+      ),
+    ];
+
+    // Mock messages per chat
+    final now = DateTime.now();
+    _messages = [
+      // Klasse 10B
+      MessageModel(
+        id: 'm1', chatId: 'group_10b', text: 'Guten Morgen alle!',
+        isMe: false, senderId: 'anna', timestamp: now.subtract(const Duration(hours: 1)),
+        status: MessageStatus.read,
+      ),
+      MessageModel(
+        id: 'm2', chatId: 'group_10b', text: 'Hausaufgabe für alle!',
+        isMe: false, senderId: 'lehrer', timestamp: now.subtract(const Duration(minutes: 10)),
+        status: MessageStatus.delivered,
+      ),
+      MessageModel(
+        id: 'm3', chatId: 'group_10b', text: 'Verstanden, danke!',
+        isMe: true, senderId: 'me', timestamp: now.subtract(const Duration(minutes: 8)),
+        status: MessageStatus.read,
+      ),
+
+      // Anna Müller
+      MessageModel(
+        id: 'm4', chatId: 'personal_anna', text: 'Hey! Wie geht\'s?',
+        isMe: true, senderId: 'me', timestamp: now.subtract(const Duration(minutes: 45)),
+        status: MessageStatus.read,
+      ),
+      MessageModel(
+        id: 'm5', chatId: 'personal_anna', text: 'Kannst du mir helfen?',
+        isMe: false, senderId: 'anna', timestamp: now.subtract(const Duration(minutes: 30)),
+        status: MessageStatus.delivered,
+      ),
+
+      // Max Schmidt
+      MessageModel(
+        id: 'm6', chatId: 'personal_max', text: 'Treffen wir uns morgen?',
+        isMe: true, senderId: 'me', timestamp: now.subtract(const Duration(hours: 3)),
+        status: MessageStatus.read,
+      ),
+      MessageModel(
+        id: 'm7', chatId: 'personal_max', text: 'Bis morgen!',
+        isMe: false, senderId: 'max', timestamp: now.subtract(const Duration(hours: 2)),
+        status: MessageStatus.read,
+      ),
+
+      // Hr. Weber
+      MessageModel(
+        id: 'm8', chatId: 'personal_lehrer', text: 'Guten Tag, Herr Weber.',
+        isMe: true, senderId: 'me', timestamp: now.subtract(const Duration(hours: 6)),
+        status: MessageStatus.read,
+      ),
+      MessageModel(
+        id: 'm9', chatId: 'personal_lehrer', text: 'Bitte pünktlich sein.',
+        isMe: false, senderId: 'lehrer', timestamp: now.subtract(const Duration(hours: 5)),
+        status: MessageStatus.delivered,
+      ),
+    ];
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void markAsRead(String chatId) {
-    // Sync both collections atomically
-    ChatManager.markAsRead(chatId);
-    _chatRooms = List.from(ChatManager.chats);
-    final idx = _chats.indexWhere((c) => c.id == chatId);
-    if (idx >= 0) _chats[idx].markAsRead();
-    final ri = _chatRooms.indexWhere((r) => r.id == chatId);
-    if (ri >= 0) _chatRooms[ri].unread = 0;
-    notifyListeners();
-  }
-
-  Future<void> sendMessage(String chatRoomId, String text) async {
-    final trimmed = text.trim();
-    if (!_chatService.validateMessage(trimmed)) {
-      _error = trimmed.isEmpty
-          ? 'Nachricht darf nicht leer sein'
-          : 'Nachricht zu lang (max. 1000 Zeichen)';
+    final index = _chatRooms.indexWhere((r) => r.id == chatId);
+    if (index != -1) {
+      _chatRooms[index] = _chatRooms[index].copyWith(unread: 0);
       notifyListeners();
-      return;
     }
-    final newMessage = MessageModel(
-      id: '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(0x7FFFFFFF)}',
-      text: _chatService.parseMessageText(text),
-      chatId: chatRoomId,
-      senderId: 'me',
-      isMe: true,
-      timestamp: DateTime.now(),
-      status: MessageStatus.sending,
-    );
-    _messages.add(newMessage);
-    notifyListeners();
-
-    try {
-      await Future.delayed(const Duration(milliseconds: 400));
-      final i = _messages.indexWhere((m) => m.id == newMessage.id);
-      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.sent);
-      ChatManager.messages.add(newMessage.copyWith(status: MessageStatus.sent));
-      // Update lastMessage in chatRoom
-      final ri = _chatRooms.indexWhere((r) => r.id == chatRoomId);
-      if (ri >= 0) {
-        _chatRooms[ri] = _chatRooms[ri].copyWith(
-          lastMessage: _previewText(text),
-          lastMessageTime: DateTime.now(),
-        );
-      }
-      _error = null;
-    } on FormatException catch (e) {
-      final i = _messages.indexWhere((m) => m.id == newMessage.id);
-      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.failed);
-      _error = 'Ungültiges Nachrichtenformat';
-      debugPrint('[Chat] FormatException: $e');
-    } on StateError catch (e) {
-      final i = _messages.indexWhere((m) => m.id == newMessage.id);
-      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.failed);
-      _error = 'Chat nicht gefunden';
-      debugPrint('[Chat] StateError: $e');
-    } catch (e, stack) {
-      final i = _messages.indexWhere((m) => m.id == newMessage.id);
-      if (i >= 0) _messages[i] = newMessage.copyWith(status: MessageStatus.failed);
-      _error = 'Fehler beim Senden';
-      debugPrint('[Chat] sendMessage error: $e
-$stack');
-    }
-    notifyListeners();
   }
 
-  /// Возвращает сообщения для чата, новейшие первыми (для reverse ListView).
   List<MessageModel> messagesForChat(String chatId) {
     final list = _messages.where((m) => m.chatId == chatId).toList();
     list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return list;
   }
 
-  int getUnreadCount(String chatId) {
-    final idx = _chats.indexWhere((c) => c.id == chatId);
-    if (idx < 0) return 0; // chat not found — not an error
-    return _chats[idx].unreadCount;
-  }
-
-  /// Stub для совместимости с main.dart (Matrix userId не используется в mock-режиме)
-  // ignore: avoid_setters_without_getters
-  void updateUserId(String? userId) {}
-
-  void clearError() {
-    _error = null;
+  void deleteMessageLocal(String messageId) {
+    _messages.removeWhere((m) => m.id == messageId);
+    _reactions.remove(messageId);
     notifyListeners();
   }
 
-  /// Converts [icon_name] emoji codes to a readable preview string
-  static String _previewText(String text) {
-    final cleaned = text.replaceAllMapped(
-      RegExp(r'\[([^\]]+)\]'),
-      (m) {
-        final code = m.group(1) ?? '';
-        // Map common icons to descriptive labels
-        if (code.startsWith('icon_')) return '🙂';
-        return '🖼';  // GIF sticker
-      },
-    ).trim();
-    return cleaned.isEmpty ? '🙂' : cleaned;
+  void deleteMessage(String messageId, String chatId) {
+    _messages.removeWhere((m) => m.id == messageId);
+    _reactions.remove(messageId);
+    // Обновляем lastMessage в ChatRoom
+    final roomIdx = _chatRooms.indexWhere((r) => r.id == chatId);
+    if (roomIdx != -1) {
+      final last = _messages
+          .where((m) => m.chatId == chatId)
+          .toList()
+        ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      _chatRooms[roomIdx] = _chatRooms[roomIdx].copyWith(
+        lastMessage: last.isNotEmpty ? last.first.text : '',
+      );
+    }
+    notifyListeners();
+  }
+
+  Future<void> sendMessage(String chatId, String text) async {
+    final msg = MessageModel(
+      // Уникальный ID: timestamp + hashCode текста (без dart:math)
+      id: '${DateTime.now().millisecondsSinceEpoch}_${text.hashCode.abs()}',
+      chatId: chatId,
+      text: text,
+      isMe: true,
+      senderId: 'me',
+      timestamp: DateTime.now(),
+      status: MessageStatus.sending,
+    );
+    _messages.add(msg);
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    // Фикс race condition: ищем по id, не по индексу last
+    final idx = _messages.indexWhere((m) => m.id == msg.id);
+    if (idx != -1) {
+      _messages[idx] = _messages[idx].copyWith(status: MessageStatus.sent);
+    }
+    notifyListeners();
   }
 }

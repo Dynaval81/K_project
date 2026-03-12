@@ -1,3 +1,4 @@
+// v1.1.3
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:knoty/core/constants.dart';
@@ -74,15 +75,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       final showDate = msgIndex == messages.length - 1 ||
                           !_isSameDay(message.timestamp,
                               messages[msgIndex + 1].timestamp);
-                      return Column(
-                        children: [
-                          if (showDate) _DateDivider(date: message.timestamp),
-                          MessageBubble(
-                            message: message,
-                            isMe: message.isMe,
-                            isPreviousFromSameSender: isPrevSame,
-                          ),
-                        ],
+                      return KeyedSubtree(
+                        key: ValueKey(message.id),
+                        child: Column(
+                          children: [
+                            if (showDate) _DateDivider(date: message.timestamp),
+                            MessageBubble(
+                              message: message,
+                              isMe: message.isMe,
+                              isPreviousFromSameSender: isPrevSame,
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),
